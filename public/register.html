@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Register User</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body { 
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex; 
+      align-items: center; 
+      justify-content: center;
+      padding: 20px;
+    }
+    
+    .register-container {
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+      overflow: hidden;
+      width: 100%;
+      max-width: 450px;
+      position: relative;
+    }
+    
+    .register-header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 40px 30px 30px;
+      text-align: center;
+      position: relative;
+    }
+    
+    .register-header::before {
+      content: '👤➕';
+      position: absolute;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 32px;
+      opacity: 0.9;
+    }
+    
+    .register-header h2 {
+      font-size: 28px;
+      font-weight: 600;
+      margin: 20px 0 0;
+    }
+    
+    .register-header p {
+      margin-top: 8px;
+      opacity: 0.9;
+      font-size: 16px;
+    }
+    
+    .register-form {
+      padding: 40px 30px;
+    }
+    
+    .form-group {
+      margin-bottom: 25px;
+      position: relative;
+    }
+    
+    label { 
+      display: block; 
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: #34495e;
+      font-size: 14px;
+    }
+    
+    input, select { 
+      width: 100%; 
+      padding: 15px 20px; 
+      border: 2px solid #e1e8ed; 
+      border-radius: 12px; 
+      font-size: 16px;
+      transition: all 0.3s ease;
+      background: white;
+    }
+    
+    input:focus, select:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+      transform: translateY(-1px);
+    }
+    
+    select {
+      cursor: pointer;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+      background-position: right 12px center;
+      background-repeat: no-repeat;
+      background-size: 16px;
+    }
+    
+    .input-icon {
+      position: absolute;
+      left: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #9ca3af;
+      font-size: 18px;
+      pointer-events: none;
+    }
+    
+    .has-icon input {
+      padding-left: 45px;
+    }
+    
+    button { 
+      width: 100%; 
+      padding: 18px; 
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white; 
+      border: none; 
+      border-radius: 12px; 
+      font-weight: 600;
+      font-size: 18px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin-top: 10px;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    button:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 28px rgba(102, 126, 234, 0.4);
+    }
+    
+    button:active {
+      transform: translateY(0);
+    }
+    
+    button:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+      transform: none;
+    }
+    
+    .loading {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 2px solid transparent;
+      border-top: 2px solid white;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-right: 8px;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    .message {
+      margin-top: 20px;
+      padding: 15px;
+      border-radius: 10px;
+      text-align: center;
+      font-weight: 500;
+      display: none;
+    }
+    
+    .error { 
+      background: #fee2e2;
+      color: #dc2626;
+      border: 1px solid #fecaca;
+    }
+    
+    .success { 
+      background: #d1fae5;
+      color: #059669;
+      border: 1px solid #a7f3d0;
+    }
+    
+    .message.show {
+      display: block;
+      animation: slideIn 0.3s ease-out;
+    }
+    
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    .form-footer {
+      text-align: center;
+      margin-top: 30px;
+      padding-top: 20px;
+      border-top: 1px solid #e5e7eb;
+      color: #6b7280;
+      font-size: 14px;
+    }
+    
+    @media (max-width: 480px) {
+      .register-container {
+        margin: 10px;
+        border-radius: 15px;
+      }
+      
+      .register-header, .register-form {
+        padding: 30px 20px;
+      }
+      
+      .register-header h2 {
+        font-size: 24px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="register-container">
+    <div class="register-header">
+      <h2>Register User</h2>
+      <p>Create a new system account</p>
+    </div>
+    
+    <div class="register-form">
+      <form id="registerForm">
+        <div class="form-group has-icon">
+          <label for="username">Username</label>
+          <div class="input-icon">👤</div>
+          <input id="username" name="username" type="text" placeholder="Enter username" required>
+        </div>
+        
+        <div class="form-group has-icon">
+          <label for="password">Password</label>
+          <div class="input-icon">🔒</div>
+          <input id="password" name="password" type="password" placeholder="Enter password" required>
+        </div>
+        
+        <div class="form-group">
+          <label for="role">Role</label>
+          <select id="role" name="role" required>
+            <option value="">Select role</option>
+            <option value="management">Management</option>
+          </select>
+        </div>
+        
+        <!-- Optionally: Add doctor_id and department_id fields if needed -->
+        
+        <button type="submit" id="submitBtn">
+          <span id="buttonText">Register User</span>
+        </button>
+        
+        <div class="message error" id="errorMsg"></div>
+        <div class="message success" id="successMsg"></div>
+      </form>
+      
+      <div class="form-footer">
+        Hospital Management System
+      </div>
+    </div>
+  </div>
+  
+  <script>
+    function showMessage(elementId, message, isError = false) {
+      const element = document.getElementById(elementId);
+      const otherElement = document.getElementById(isError ? 'successMsg' : 'errorMsg');
+      
+      // Hide other message
+      otherElement.classList.remove('show');
+      otherElement.textContent = '';
+      
+      // Show current message
+      element.textContent = message;
+      element.classList.add('show');
+      
+      // Auto-hide success messages after 3 seconds
+      if (!isError) {
+        setTimeout(() => {
+          element.classList.remove('show');
+        }, 3000);
+      }
+    }
+    
+    document.getElementById('registerForm').onsubmit = async function(e) {
+      e.preventDefault();
+      
+      // Clear previous messages
+      document.getElementById('errorMsg').classList.remove('show');
+      document.getElementById('successMsg').classList.remove('show');
+      
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value;
+      const role = document.getElementById('role').value;
+      
+      // Show loading state
+      const submitBtn = document.getElementById('submitBtn');
+      const buttonText = document.getElementById('buttonText');
+      submitBtn.disabled = true;
+      buttonText.innerHTML = '<div class="loading"></div>Registering...';
+      
+      // Optionally: get doctor_id, department_id from additional fields
+      try {
+        const res = await fetch('/register', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + (localStorage.getItem('token') || '')
+          },
+          body: JSON.stringify({ username, password, role })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Registration failed');
+        
+        showMessage('successMsg', 'User registered successfully!');
+        document.getElementById('registerForm').reset();
+      } catch (err) {
+        showMessage('errorMsg', err.message, true);
+      } finally {
+        // Reset button state
+        submitBtn.disabled = false;
+        buttonText.textContent = 'Register User';
+      }
+    };
+  </script>
+</body>
+</html>

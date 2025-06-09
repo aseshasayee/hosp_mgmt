@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Management Home</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body { 
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 2rem 1rem;
+    }
+    
+    .container { 
+      max-width: 600px; 
+      margin: 0 auto; 
+      background: #ffffff;
+      border-radius: 16px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+    }
+    
+    .header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      padding: 2.5rem 2rem;
+      text-align: center;
+      color: white;
+    }
+    
+    .header h2 {
+      font-size: 2rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+    
+    .header p {
+      opacity: 0.9;
+      font-size: 1.1rem;
+    }
+    
+    .main-content {
+      padding: 2rem;
+    }
+    
+    .action-buttons {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+    
+    .btn { 
+      padding: 1.2rem 1.5rem;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      font-size: 1.1rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+    }
+    
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+    }
+    
+    .btn:active {
+      transform: translateY(0);
+    }
+    
+    .section {
+      margin-top: 2rem;
+      background: #f8fafd;
+      border-radius: 12px;
+      padding: 1.5rem;
+      border: 1px solid #e3e8ef;
+    }
+    
+    .section h3 {
+      color: #2c3e50;
+      font-size: 1.3rem;
+      margin-bottom: 1.5rem;
+      font-weight: 600;
+    }
+    
+    .form-group {
+      margin-bottom: 1rem;
+    }
+    
+    .form-group label {
+      display: block;
+      margin-bottom: 0.5rem;
+      color: #555;
+      font-weight: 500;
+    }
+    
+    select, input { 
+      padding: 0.9rem 1rem;
+      border: 2px solid #e3e8ef;
+      border-radius: 8px;
+      margin: 0.5rem 0;
+      width: 100%;
+      font-size: 1rem;
+      transition: border-color 0.3s ease;
+      background: white;
+    }
+    
+    select:focus, input:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+    
+    .assign-section {
+      background: white;
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-top: 1rem;
+      border: 2px solid #e3e8ef;
+    }
+    
+    .assign-section h4 {
+      color: #2c3e50;
+      margin-bottom: 1rem;
+      font-size: 1.1rem;
+    }
+    
+    .success {
+      color: #27ae60;
+      background: #d5f4e6;
+      padding: 0.8rem 1rem;
+      border-radius: 8px;
+      margin-top: 1rem;
+      font-weight: 500;
+    }
+    
+    .error {
+      color: #e74c3c;
+      background: #fdeaea;
+      padding: 0.8rem 1rem;
+      border-radius: 8px;
+      margin-top: 1rem;
+      font-weight: 500;
+    }
+    
+    .search-input {
+      position: relative;
+    }
+    
+    .search-input::before {
+      content: "🔍";
+      position: absolute;
+      left: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 1;
+    }
+    
+    .search-input input {
+      padding-left: 3rem;
+    }
+    
+    .patient-card {
+      background: white;
+      border: 1px solid #e3e8ef;
+      border-radius: 8px;
+      padding: 1rem;
+      margin: 0.5rem 0;
+    }
+    
+    @media (max-width: 600px) {
+      .action-buttons {
+        grid-template-columns: 1fr;
+      }
+      
+      .container {
+        margin: 0;
+        border-radius: 0;
+      }
+      
+      body {
+        padding: 0;
+      }
+      
+      .header {
+        padding: 2rem 1rem;
+      }
+      
+      .main-content {
+        padding: 1.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <script>
+    // Protect the page: Only management can access
+    const token = localStorage.getItem('token');
+    if (!token) window.location.href = '/login.html';
+    function parseJwt(token) {
+      try { return JSON.parse(atob(token.split('.')[1])); } catch (e) { return {}; }
+    }
+    const user = parseJwt(token);
+    if (user.role !== 'management') window.location.href = '/login.html';
+  </script>
+  
+  <div class="container">
+    <div class="header">
+      <h2>🏥 Management Portal</h2>
+      <p>Hospital Management System</p>
+    </div>
+    
+    <div class="main-content">
+      <div class="action-buttons">
+        <button class="btn" onclick="window.location.href='/management.html'">
+          👤 New Patient
+        </button>
+        <button class="btn" onclick="showExisting()">
+          📋 Existing Patient
+        </button>
+      </div>
+      
+      <div class="section" id="existingSection" style="display:none;">
+        <h3>📝 Assign Visit for Existing Patient</h3>
+        
+        <div class="form-group">
+          <label for="searchPatient">Search Patient</label>
+          <div class="search-input">
+            <input type="text" id="searchPatient" placeholder="Search by name or phone number" oninput="searchPatients()">
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <select id="patientSelect" style="display:none;" onchange="showAssignVisit()"></select>
+        </div>
+        
+        <div class="assign-section" id="assignVisitSection" style="display:none;">
+          <h4>Visit Assignment Details</h4>
+          
+          <div class="form-group">
+            <label for="visitReason">Reason for Visit</label>
+            <input type="text" id="visitReason" placeholder="Enter reason for visit" required>
+          </div>
+          
+          <div class="form-group">
+            <label for="doctorSelect">Assign Doctor</label>
+            <select id="doctorSelect" required></select>
+          </div>
+          
+          <button class="btn" onclick="assignVisit()">
+            ✅ Assign and Forward
+          </button>
+          
+          <div id="visitMsg"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <script>
+    function showExisting() {
+      document.getElementById('existingSection').style.display = '';
+      document.getElementById('assignVisitSection').style.display = 'none';
+      document.getElementById('patientSelect').style.display = 'none';
+      document.getElementById('patientSelect').innerHTML = '';
+    }
+
+    async function searchPatients() {
+      const query = document.getElementById('searchPatient').value.trim();
+      if (query.length < 2) return;
+      const res = await fetch('/patients', { headers: { 'Authorization': 'Bearer ' + token } });
+      const patients = await res.json();
+      const filtered = patients.filter(p =>
+        p.first_name.toLowerCase().includes(query.toLowerCase()) ||
+        p.last_name.toLowerCase().includes(query.toLowerCase()) ||
+        (p.phone && p.phone.includes(query))
+      );
+      const sel = document.getElementById('patientSelect');
+      sel.innerHTML = '<option value="">Select patient</option>' + filtered.map(p =>
+        `<option value="${p.patient_id}">${p.first_name} ${p.last_name} (${p.phone || 'No phone'})</option>`
+      ).join('');
+      sel.style.display = filtered.length ? '' : 'none';
+      document.getElementById('assignVisitSection').style.display = 'none';
+    }
+
+    async function showAssignVisit() {
+      const pid = document.getElementById('patientSelect').value;
+      if (!pid) { document.getElementById('assignVisitSection').style.display = 'none'; return; }
+      // Load doctors for assignment
+      const res = await fetch('/doctors', { headers: { 'Authorization': 'Bearer ' + token } });
+      const doctors = await res.json();
+      const sel = document.getElementById('doctorSelect');
+      sel.innerHTML = '<option value="">Assign to doctor</option>' + doctors.map(d =>
+        `<option value="${d.doctor_id}">${d.name} (${d.specialization || ''})</option>`
+      ).join('');
+      document.getElementById('assignVisitSection').style.display = '';
+    }
+
+    async function assignVisit() {
+      const patient_id = document.getElementById('patientSelect').value;
+      const doctor_id = document.getElementById('doctorSelect').value;
+      const reason = document.getElementById('visitReason').value.trim();
+      if (!patient_id || !doctor_id || !reason) {
+        document.getElementById('visitMsg').innerHTML = '<span class="error">❌ All fields are required.</span>';
+        return;
+      }
+      const res = await fetch('/visits', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+        body: JSON.stringify({ patient_id, doctor_id, reason })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        document.getElementById('visitMsg').innerHTML = '<span class="success">✅ Visit assigned and forwarded successfully!</span>';
+        document.getElementById('assignVisitSection').style.display = 'none';
+        document.getElementById('patientSelect').style.display = 'none';
+        document.getElementById('searchPatient').value = '';
+      } else {
+        document.getElementById('visitMsg').innerHTML = `<span class="error">❌ Error: ${data.error}</span>`;
+      }
+    }
+  </script>
+</body>
+</html>

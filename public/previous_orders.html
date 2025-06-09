@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Previous Orders</title>
+  <style>
+    table { width: 100%; border-collapse: collapse; margin-top: 1em;}
+    th, td { padding: 0.8em; border: 1px solid #ddd; }
+    .status-complete { color: #2ecc71; }
+    input, button { padding: 0.5em; margin: 0.2em; }
+  </style>
+</head>
+<body>
+  <h2>Previous Completed Orders</h2>
+  <form id="searchForm">
+    <label>Patient ID: <input type="text" id="patientId"></label>
+    <label>Patient Name: <input type="text" id="patientName"></label>
+    <button type="submit">Search</button>
+  </form>
+  <table id="prev-table">
+    <thead>
+      <tr>
+        <th>Patient ID</th>
+        <th>Name</th>
+        <th>Procedure</th>
+        <th>Modality</th>
+        <th>Scheduled Time</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+  <script>
+    document.getElementById('searchForm').onsubmit = async function(e) {
+      e.preventDefault();
+      const patientId = document.getElementById('patientId').value.trim();
+      const name = document.getElementById('patientName').value.trim();
+      let url = '/previous_orders?';
+      if (patientId) url += 'patientId=' + encodeURIComponent(patientId) + '&';
+      if (name) url += 'name=' + encodeURIComponent(name);
+      const res = await fetch(url);
+      const orders = await res.json();
+      const tbody = document.querySelector('#prev-table tbody');
+      if (!orders.length) {
+        tbody.innerHTML = '<tr><td colspan="6">No previous orders found</td></tr>';
+        return;
+      }
+      tbody.innerHTML = orders.map(order => `
+        <tr>
+          <td>${order.patientId}</td>
+          <td>${order.patientName}</td>
+          <td>${order.procedure}</td>
+          <td>${order.modality}</td>
+          <td>${new Date(order.scheduledTime).toLocaleString()}</td>
+          <td class="status-complete">${order.status}</td>
+        </tr>
+      `).join('');
+    };
+  </script>
+</body>
+</html>

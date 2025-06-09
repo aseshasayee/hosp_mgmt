@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Department Queue</title>
+  <style>
+    table { width: 100%; border-collapse: collapse; }
+    th, td { padding: 0.8em; border: 1px solid #ddd; }
+    .status-scheduled { color: #e67e22; }
+    .status-complete { color: #2ecc71; }
+    button { padding: 0.5em 1em; cursor: pointer; }
+  </style>
+</head>
+<body>
+  <h2>Department Worklist Queue</h2>
+  <a href="previous_orders.html" target="_blank">View Previous Orders</a>
+  <table id="queue-table">
+    <thead>
+      <tr>
+        <th>Patient ID</th>
+        <th>Name</th>
+        <th>Procedure</th>
+        <th>Modality</th>
+        <th>Scheduled Time</th>
+        <th>Status</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+  
+  <script>
+    let lastOrders = [];
+    async function loadQueue(department = 'Radiology') {
+      try {
+        const res = await fetch(`/mwl_orders/${department}`);
+        const orders = await res.json();
+        lastOrders = orders;
+        const tbody = document.querySelector('#queue-table tbody');
+        if (!orders.length) {
+          tbody.innerHTML = '<tr><td colspan="7">No orders found</td></tr>';
+          return;
+        }
+        tbody.innerHTML = orders.map(order => `
+          <tr data-orderid="${order.orderId}">
+            <td>${order.patientId}</td>
+            <td>${order.patientName}</td>
+            <td>${order.procedure}</td>
+            <td>${order.modality}</td>
+            <td>${new Date(order.scheduledTime).toLocaleString()}</td>
+            <td class="status-${order.status.toLowerCase()}">${order.status}</td>
+            <td>
+              ${order.status === 'SCHEDULED' 
+                ? `<button onclick="markDone(${order.orderId}, '${order.patientId}', '${order.modality}', '${order.scheduledTime}')">Mark as Done</button>`
+                : ''}
+            </td>
+          </tr>
+        `).join('');
+      } catch (err) {
+        document.querySelector('#queue-table tbody').innerHTML = `
+          <tr><td colspan="7" style="color:red;">Error loading orders: ${err.message}</td></tr>`;
+      }
+    }
+
+    async function markDone(orderId, patientId, modality, scheduledTime) {
+      if (!confirm('Mark this order as complete?')) return;
+      try {
+        const response = await fetch('/mark_order_done', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ orderId, patientId, modality, scheduledTime })
+        });
+        if (!response.ok) throw new Error('Failed to mark order');
+        // Remove the row after 5 seconds
+        setTimeout(() => {
+          const row = document.querySelector(`tr[data-orderid="${orderId}"]`);
+          if (row) row.remove();
+        }, 5000);
+        loadQueue();
+      } catch (err) {
+        alert('Error: ' + err.message);
+      }
+    }
+
+    loadQueue();
+
+    // WebSocket connection (unchanged)
+    const ws = new WebSocket('ws://localhost:8081');
+    ws.onmessage = () => loadQueue();
+  </script>
+</body>
+</html>

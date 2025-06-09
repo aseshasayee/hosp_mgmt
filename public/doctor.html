@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Doctor Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f5f7fa; margin: 0; }
+    .header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 1.5rem 0 1rem 0;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+    }
+    .header-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+    }
+    .header-icon {
+      width: 38px; height: 38px; border-radius: 50%; background: rgba(255,255,255,0.2);
+      display: flex; align-items: center; justify-content: center; font-size: 1.5rem;
+    }
+    .header-title {
+      font-size: 2rem; font-weight: 700; letter-spacing: 1px;
+    }
+    .header-right {
+      text-align: right; font-size: 1rem; color: #f3f3f3; line-height: 1.5; display: flex; align-items: center; gap: 1.2rem;
+    }
+    .logout-btn {
+      background: #fff; color: #764ba2; border: none; border-radius: 6px; padding: 0.5em 1em; font-size: 1em; font-weight: 600;
+      cursor: pointer; transition: background 0.2s, color 0.2s;
+      box-shadow: 0 1px 4px rgba(118,75,162,0.07);
+    }
+    .logout-btn:hover { background: #764ba2; color: #fff; }
+    .container { max-width: 1200px; margin: 2rem auto; padding: 0 2rem; }
+    .dashboard-grid { display: grid; gap: 2rem; margin-bottom: 2rem; }
+    .card { background: white; border-radius: 12px; padding: 2rem; box-shadow: 0 4px 20px rgba(0,0,0,0.08); border: 1px solid rgba(0,0,0,0.05); }
+    .card-header { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem; }
+    .card-icon { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; color: white; }
+    .search-icon { background: linear-gradient(135deg, #667eea, #764ba2); }
+    .queue-icon { background: linear-gradient(135deg, #f093fb, #f5576c); }
+    .card h2 { font-size: 1.4rem; font-weight: 600; color: #2c3e50; }
+    .search-container { position: relative; }
+    .search-input { width: 100%; padding: 1rem 1rem 1rem 3rem; font-size: 1rem; border: 2px solid #e9ecef; border-radius: 8px; background: #f8f9fa; }
+    .search-input:focus { outline: none; border-color: #667eea; background: white; box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1); }
+    .search-icon-input { position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: #6c757d; font-size: 1rem; }
+    .current-patient { background: linear-gradient(135deg, #e8f5e8, #d4f3d4); border: 2px solid #28a745; border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 4px 15px rgba(40, 167, 69, 0.1); }
+    .current-patient-details { flex: 1; }
+    .current-patient-label { font-size: 0.9rem; font-weight: 600; color: #155724; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.5rem; }
+    .patient-name { font-size: 1.3rem; font-weight: 700; color: #2c3e50; margin-bottom: 0.5rem; }
+    .patient-info { color: #495057; font-size: 0.95rem; }
+    .queue-table { width: 100%; border-collapse: collapse; margin-top: 1rem; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+    .queue-table th { background: linear-gradient(135deg, #f8f9fa, #e9ecef); padding: 1rem; text-align: left; font-weight: 600; color: #495057; border-bottom: 2px solid #dee2e6; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.5px; }
+    .queue-table td { padding: 1rem; border-bottom: 1px solid #f1f3f4; transition: background-color 0.2s ease; }
+    .queue-table tr:hover td { background: #f8f9fa; }
+    .queue-table tr:last-child td { border-bottom: none; }
+    .btn { padding: 0.7rem 1.5rem; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 0.9rem; transition: all 0.3s ease; text-decoration: none; display: inline-block; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+    .btn-primary { background: linear-gradient(135deg, #667eea, #764ba2); color: white; }
+    .btn-danger { background: linear-gradient(135deg, #ff6b6b, #ee5a52); color: white; }
+    .btn-success { background: linear-gradient(135deg, #51cf66, #40c057); color: white; }
+    .btn-secondary { background: linear-gradient(135deg, #868e96, #6c757d); color: white; }
+    .status-badge { padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+    .status-waiting { background: #fff3cd; color: #856404; }
+    .status-in-progress { background: #d1ecf1; color: #0c5460; }
+    .status-completed { background: #d4edda; color: #155724; }
+    .empty-state { text-align: center; padding: 3rem 2rem; color: #6c757d; }
+    .empty-state-icon { font-size: 3rem; margin-bottom: 1rem; color: #dee2e6; }
+    /* Modal styles */
+    .modal-bg { display: none; position: fixed; left: 0; top: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; backdrop-filter: blur(4px);}
+    .modal { background: white; border-radius: 16px; max-width: 900px; width: 95%; max-height: 90vh; overflow-y: auto; position: relative; box-shadow: 0 20px 60px rgba(0,0,0,0.2); animation: modalSlideIn 0.3s ease; }
+    @keyframes modalSlideIn { from { opacity: 0; transform: scale(0.9) translateY(-20px);} to { opacity: 1; transform: scale(1) translateY(0);} }
+    .modal-header { padding: 2rem 2rem 1rem 2rem; border-bottom: 1px solid #e9ecef; position: sticky; top: 0; background: white; z-index: 10; }
+    .modal-close { position: absolute; right: 1.5rem; top: 1.5rem; width: 32px; height: 32px; border-radius: 50%; background: #f8f9fa; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; cursor: pointer; color: #6c757d; transition: all 0.2s ease; }
+    .modal-close:hover { background: #e9ecef; color: #495057; }
+    .modal-content { padding: 1rem 2rem 2rem 2rem; }
+    .modal h3 { font-size: 1.5rem; font-weight: 600; color: #2c3e50; margin: 0; }
+    .section-card { background: #f8f9fa; border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem; border-left: 4px solid #667eea; }
+    .section-title { font-weight: 700; color: #2c3e50; margin-bottom: 1rem; font-size: 1.1rem; display: flex; align-items: center; gap: 0.5rem; }
+    .info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; }
+    .info-item { display: flex; flex-direction: column; gap: 0.25rem; }
+    .info-label { font-size: 0.85rem; font-weight: 600; color: #6c757d; text-transform: uppercase; letter-spacing: 0.5px; }
+    .info-value { font-size: 1rem; color: #2c3e50; font-weight: 500; }
+    .visit-folders { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 1rem; margin-top: 1rem; }
+    .folder { display: flex; flex-direction: column; align-items: center; padding: 1.5rem 1rem; background: white; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.08); cursor: pointer; transition: all 0.3s ease; border: 2px solid transparent; position: relative; }
+    .folder:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.15); border-color: #667eea; }
+    .folder.selected { border-color: #667eea; background: linear-gradient(135deg, #f8f9ff, #e6f3ff); }
+    .folder-icon { width: 48px; height: 40px; margin-bottom: 1rem; position: relative; }
+    .folder-icon .tab { width: 24px; height: 10px; background: linear-gradient(135deg, #a8b5ff, #667eea); border-radius: 6px 12px 0 0; position: absolute; left: 0; top: 0; }
+    .folder-icon .body { width: 48px; height: 28px; background: linear-gradient(135deg, #667eea, #764ba2); border-radius: 0 6px 6px 6px; position: absolute; left: 0; top: 10px; box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3); }
+    .folder-label { font-size: 0.9rem; color: #2c3e50; font-weight: 600; text-align: center; line-height: 1.3; }
+    .actions { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top: 1rem; }
+    .reports-list { list-style: none; padding: 0; }
+    .reports-list li { padding: 0.75rem 1rem; background: white; border-radius: 8px; margin-bottom: 0.5rem; box-shadow: 0 2px 8px rgba(0,0,0,0.05); transition: all 0.2s ease; }
+    .reports-list li:hover { transform: translateX(4px); box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+    .reports-list a { color: #667eea; text-decoration: none; font-weight: 500; display: flex; align-items: center; gap: 0.5rem; }
+    .reports-list a:hover { color: #764ba2; }
+    .success { color: #28a745; font-weight: 600; }
+    .error { color: #dc3545; font-weight: 600; }
+    @media (max-width: 768px) {
+      .container { padding: 0 1rem; }
+      .header-content { padding: 0 1rem; }
+      .card { padding: 1.5rem; }
+      .modal { width: 98%; margin: 1rem; }
+      .modal-content { padding: 1rem; }
+      .current-patient { flex-direction: column; align-items: flex-start; gap: 1rem; }
+      .info-grid { grid-template-columns: 1fr; }
+      .actions { grid-template-columns: 1fr; }
+      .visit-folders { grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); }
+    }
+  </style>
+</head>
+<body>
+  <script>
+    // Protect the page: Only doctors can access
+    const token = localStorage.getItem('token');
+    if (!token) window.location.href = '/login.html';
+    function parseJwt(token) {
+      try { return JSON.parse(atob(token.split('.')[1])); } catch (e) { return {}; }
+    }
+    const user = parseJwt(token);
+    if (user.role !== 'doctor') window.location.href = '/login.html';
+  </script>
+
+  <div class="header">
+    <div class="header-content">
+      <div class="header-left">
+        <span class="header-icon">🏥</span>
+        <span class="header-title">Doctor Dashboard</span>
+      </div>
+      <div class="header-right" id="doctorInfo">
+        <span id="doctorWelcome"></span>
+        <button class="logout-btn" onclick="logout()">Logout</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="dashboard-grid">
+      <!-- Search Section -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon search-icon">🔍</div>
+          <h2>Search Patients</h2>
+        </div>
+        <div class="search-container">
+          <input type="text" id="searchBox" class="search-input" placeholder="Search patients by name or phone..." oninput="searchPatients()">
+          <span class="search-icon-input">🔍</span>
+        </div>
+        <div id="searchResults"></div>
+      </div>
+
+      <!-- Queue Section -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon queue-icon">📋</div>
+          <h2>Today's Queue</h2>
+        </div>
+        <div id="queueList"></div>
+      </div>
+    </div>
+
+    <!-- Modal for all patient/visit details -->
+    <div id="visitModalBg" class="modal-bg" onclick="closeModal(event)">
+      <div id="visitModal" class="modal" onclick="event.stopPropagation();">
+        <div class="modal-header">
+          <h3>Patient Details</h3>
+          <span class="modal-close" onclick="closeModal(event)">&times;</span>
+        </div>
+        <div class="modal-content" id="modalContentScroll">
+          <div id="visitModalContent"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let lastPatient = null, lastVisits = null, selectedVisitId = null;
+
+    // --- Fill doctor info in header ---
+    function fillDoctorInfo() {
+      let html = `Welcome, Dr. <b>${user.first_name || 'Doctor'}</b>`;
+      if (user.specialization) html += `<br><span style="font-size:0.97em;">Specialization: ${user.specialization}</span>`;
+      if (user.email) html += `<br><span style="font-size:0.97em;">Email: ${user.email}</span>`;
+      document.getElementById('doctorWelcome').innerHTML = html;
+    }
+
+    function logout() {
+      localStorage.removeItem('token');
+      window.location.href = '/login.html';
+    }
+
+    // --- Load doctor's queue with current patient on top ---
+    async function loadQueue() {
+      const res = await fetch('/doctor/queue', { headers: { 'Authorization': 'Bearer ' + token } });
+      const visits = await res.json();
+      const queueDiv = document.getElementById('queueList');
+      if (!visits.length) {
+        queueDiv.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-state-icon">📭</div>
+            <p>No patients in queue today</p>
+          </div>
+        `;
+        return;
+      }
+      const [current, ...queue] = visits;
+      let html = '';
+      if (current) {
+        html += `
+          <div class="current-patient">
+            <div class="current-patient-details">
+              <div class="current-patient-label">Current Patient</div>
+              <div class="patient-name">${current.first_name} ${current.last_name}</div>
+              <div class="patient-info">
+                <strong>Reason:</strong> ${current.reason || 'General consultation'}<br>
+                <strong>Status:</strong> <span class="status-badge status-${current.status.toLowerCase().replace(' ', '-')}">${current.status}</span>
+              </div>
+            </div>
+            <button class="btn btn-primary" onclick="openPatientModal('${current.patient_id}', '${current.visit_id}')">View Details</button>
+          </div>
+        `;
+      }
+      if (queue.length) {
+        html += `
+          <table class="queue-table">
+            <thead>
+              <tr>
+                <th>Patient Name</th>
+                <th>Reason for Visit</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${queue.map(v => `
+                <tr>
+                  <td><strong>${v.first_name} ${v.last_name}</strong></td>
+                  <td>${v.reason || 'General consultation'}</td>
+                  <td><span class="status-badge status-${v.status.toLowerCase().replace(' ', '-')}">${v.status}</span></td>
+                  <td><button class="btn btn-primary" onclick="openPatientModal('${v.patient_id}', '${v.visit_id}')">View</button></td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        `;
+      }
+      queueDiv.innerHTML = html;
+    }
+
+    // --- Patient Search ---
+    async function searchPatients() {
+      const q = document.getElementById('searchBox').value.trim();
+      if (q.length < 2) {
+        document.getElementById('searchResults').innerHTML = '';
+        return;
+      }
+      const res = await fetch('/doctor/patients?q=' + encodeURIComponent(q), { headers: { 'Authorization': 'Bearer ' + token } });
+      const patients = await res.json();
+      const div = document.getElementById('searchResults');
+      if (!patients.length) {
+        div.innerHTML = `
+          <div class="empty-state" style="padding: 2rem 1rem;">
+            <div class="empty-state-icon">👤</div>
+            <p>No patients found matching your search</p>
+          </div>
+        `;
+        return;
+      }
+      div.innerHTML = `
+        <div style="margin-top: 1.5rem;">
+          <table class="queue-table">
+            <thead>
+              <tr>
+                <th>Patient Name</th>
+                <th>Date of Birth</th>
+                <th>Gender</th>
+                <th>Phone</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${patients.map(p => `
+                <tr>
+                  <td><strong>${p.first_name} ${p.last_name}</strong></td>
+                  <td>${new Date(p.dob).toLocaleDateString()}</td>
+                  <td>${p.sex}</td>
+                  <td>${p.phone || 'Not provided'}</td>
+                  <td><button class="btn btn-primary" onclick="openPatientModal('${p.patient_id}')">View</button></td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>
+      `;
+    }
+
+    // --- Open patient modal with full details and visit history ---
+    async function openPatientModal(patient_id, focusVisitId = null) {
+      // Get patient info
+      const res = await fetch('/patient/' + patient_id, { headers: { 'Authorization': 'Bearer ' + token } });
+      const p = await res.json();
+      lastPatient = p;
+      // Get visit history
+      const vres = await fetch('/doctor/patient/' + patient_id + '/visits', { headers: { 'Authorization': 'Bearer ' + token } });
+      const visits = await vres.json();
+      lastVisits = visits;
+      // If no visits, show just patient info
+      if (!visits.length) {
+        document.getElementById('visitModalContent').innerHTML = `
+          <div class="section-card">
+            <div class="section-title">👤 Patient Information</div>
+            ${renderPatientInfo(p)}
+          </div>
+          <div class="section-card">
+            <div class="section-title">📋 Visit History</div>
+            <div class="empty-state">
+              <div class="empty-state-icon">📋</div>
+              <p>No previous visits recorded</p>
+            </div>
+          </div>
+        `;
+        document.getElementById('visitModalBg').style.display = 'flex';
+        return;
+      }
+      // By default, select the most recent visit or the focusVisitId
+      let visitToShow = visits[0];
+      if (focusVisitId) {
+        const found = visits.find(v => v.visit_id === focusVisitId);
+        if (found) visitToShow = found;
+      }
+      selectedVisitId = visitToShow.visit_id;
+      await renderModal(p, visits, visitToShow);
+      document.getElementById('visitModalBg').style.display = 'flex';
+      // Scroll modal to top on open
+      document.getElementById('modalContentScroll').scrollTop = 0;
+    }
+
+    function renderPatientInfo(p) {
+      return `
+        <div class="info-grid">
+          <div class="info-item">
+            <span class="info-label">Full Name</span>
+            <span class="info-value">${p.first_name} ${p.last_name}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Date of Birth</span>
+            <span class="info-value">${p.dob}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Gender</span>
+            <span class="info-value">${p.sex}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Phone Number</span>
+            <span class="info-value">${p.phone || 'Not provided'}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Address</span>
+            <span class="info-value">${p.address || 'Not provided'}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Known Allergies</span>
+            <span class="info-value">${p.allergies || 'None reported'}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Emergency Contact</span>
+            <span class="info-value">${p.emergency_contact || 'Not provided'}</span>
+          </div>
+        </div>
+      `;
+    }
+
+    async function renderModal(p, visits, v) {
+      // Fetch reports for this visit
+      let reports = [];
+      try {
+        reports = await fetch(`/api/reports?visit_id=${v.visit_id}`, { headers: { 'Authorization': 'Bearer ' + token } }).then(r => r.json());
+      } catch { /* ignore */ }
+      let content = `
+        <div class="section-card">
+          <div class="section-title">👤 Patient Information</div>
+          ${renderPatientInfo(p)}
+        </div>
+        <div class="section-card">
+          <div class="section-title">🏥 Current Visit Details</div>
+          <div class="info-grid">
+            <div class="info-item">
+              <span class="info-label">Visit Date</span>
+              <span class="info-value">${new Date(v.created_at).toLocaleString()}</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">Department</span>
+              <span class="info-value">${v.department_name || 'General'}</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">Reason for Visit</span>
+              <span class="info-value">${v.reason || 'General consultation'}</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">Current Status</span>
+              <span class="info-value"><span class="status-badge status-${v.status.toLowerCase().replace(' ', '-')}">${v.status}</span></span>
+            </div>
+          </div>
+        </div>
+        <div class="section-card">
+          <div class="section-title">📊 Medical Reports</div>
+          ${reports.length ? `
+            <ul class="reports-list">
+              ${reports.map(r => `
+                <li>
+                  <a href="/api/reports/download/${r.report_id}" target="_blank">
+                    📄 ${r.report_type || 'Medical Report'} (${r.file_name})
+                  </a>
+                </li>
+              `).join('')}
+            </ul>
+          ` : `
+            <div class="empty-state">
+              <div class="empty-state-icon">📊</div>
+              <p>No reports available for this visit</p>
+            </div>
+          `}
+        </div>
+        <div class="section-card">
+          <div class="section-title">⚡ Quick Actions</div>
+          <div class="actions">
+            <button class="btn btn-primary" onclick="orderScan('${v.patient_id}', '${v.visit_id}')">🔬 Request Scan/Test</button>
+            <button class="btn btn-secondary" onclick="uploadReport('${v.patient_id}', '${v.visit_id}', '${user.doctor_id}')">📤 Upload Test Report</button>
+            <a class="btn btn-success" href="/dicom_viewer.html?visit_id=${v.visit_id}" target="_blank">🖼️ View DICOM Images</a>
+            <button class="btn btn-danger" onclick="markVisitDone('${v.visit_id}')">✅ Mark as Complete</button>
+          </div>
+        </div>
+        <div class="section-card">
+          <div class="section-title">📅 Visit History</div>
+          <div class="visit-folders">
+            ${visits.map(hist => `
+              <div class="folder${hist.visit_id === v.visit_id ? ' selected' : ''}" 
+                onclick="openPatientModal('${hist.patient_id || p.patient_id}', '${hist.visit_id}'); setTimeout(()=>{document.getElementById('modalContentScroll').scrollTop=0;},10)">
+                <span class="folder-icon">
+                  <span class="tab"></span>
+                  <span class="body"></span>
+                </span>
+                <span class="folder-label">${new Date(hist.created_at).toLocaleDateString()}<br><small>${new Date(hist.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</small></span>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `;
+      document.getElementById('visitModalContent').innerHTML = content;
+      // Always scroll modal to top on visit switch
+      document.getElementById('modalContentScroll').scrollTop = 0;
+    }
+
+    function closeModal(e) {
+      document.getElementById('visitModalBg').style.display = 'none';
+    }
+
+    // Upload report (redirect to upload_report.html)
+    function uploadReport(patient_id, visit_id, doctor_id) {
+      window.open(`/upload_report.html?patient_id=${patient_id}&visit_id=${visit_id}&doctor_id=${doctor_id}`, '_blank');
+    }
+
+    // Mark visit as complete (from modal)
+    async function markVisitDone(visit_id) {
+      if (!confirm('Are you sure you want to mark this visit as completed?')) return;
+      const res = await fetch('/doctor/visit/' + visit_id + '/complete', {
+        method: 'POST',
+        headers: { 'Authorization': 'Bearer ' + token }
+      });
+      if (res.ok) {
+        alert('Visit marked as complete successfully.');
+        closeModal();
+        loadQueue();
+      } else {
+        alert('Error marking visit as complete. Please try again.');
+      }
+    }
+
+    // Request scan/test
+    function orderScan(patient_id, visit_id) {
+      window.open(`/index.html?patient_id=${patient_id}&visit_id=${visit_id}`, '_blank');
+    }
+
+    // Initial load
+    fillDoctorInfo();
+    loadQueue();
+  </script>
+</body>
+</html>

@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Add New Patient</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 2em; background: #f8fafd; }
+    h2 { color: #2c3e50; }
+    form { background: #fff; padding: 2em; border-radius: 8px; max-width: 400px; margin: auto; box-shadow: 0 2px 8px #0001; }
+    .form-group { margin: 1em 0; }
+    label { display: block; font-weight: bold; margin-bottom: 0.5em; }
+    input, select, textarea {
+      width: 100%; padding: 0.7em; border: 1px solid #ddd; border-radius: 4px; font-size: 1em;
+    }
+    button {
+      background: #3498db; color: white; border: none; padding: 1em; border-radius: 4px;
+      font-weight: bold; width: 100%; cursor: pointer; margin-top: 1em;
+    }
+    button:disabled { background: #bbb; }
+    .success { color: green; margin-top: 1em; }
+    .error { color: red; margin-top: 1em; }
+    a { display: block; margin: 2em auto 0; text-align: center; color: #3498db; }
+  </style>
+</head>
+<body>
+  <h2>Add New Patient</h2>
+  <form id="patient-form">
+    <div class="form-group">
+      <label for="first_name">First Name*</label>
+      <input type="text" id="first_name" name="first_name" required>
+    </div>
+    <div class="form-group">
+      <label for="last_name">Last Name*</label>
+      <input type="text" id="last_name" name="last_name" required>
+    </div>
+    <div class="form-group">
+      <label for="dob">Date of Birth* (YYYY-MM-DD)</label>
+      <input type="date" id="dob" name="dob" required>
+    </div>
+    <div class="form-group">
+      <label for="sex">Sex*</label>
+      <select id="sex" name="sex" required>
+        <option value="">Select</option>
+        <option value="M">Male</option>
+        <option value="F">Female</option>
+        <option value="O">Other</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label for="address">Address*</label>
+      <textarea id="address" name="address" required></textarea>
+    </div>
+    <div class="form-group">
+      <label for="allergies">Allergies</label>
+      <input type="text" id="allergies" name="allergies" placeholder="(optional)">
+    </div>
+    <button type="submit">Add Patient</button>
+    <div class="success" id="success-msg" style="display:none;"></div>
+    <div class="error" id="error-msg" style="display:none;"></div>
+  </form>
+  <a href="index.html">← Back to Order Entry</a>
+  <script>
+    document.getElementById('patient-form').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      document.getElementById('success-msg').style.display = 'none';
+      document.getElementById('error-msg').style.display = 'none';
+
+      const data = {
+        first_name: document.getElementById('first_name').value.trim(),
+        last_name: document.getElementById('last_name').value.trim(),
+        dob: document.getElementById('dob').value,
+        sex: document.getElementById('sex').value,
+        address: document.getElementById('address').value.trim(),
+        allergies: document.getElementById('allergies').value.trim()
+      };
+
+      try {
+        const res = await fetch('/patients', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+        if (res.ok) {
+          const patient = await res.json();
+          document.getElementById('success-msg').textContent = `Patient ${patient.first_name} ${patient.last_name} added (ID: ${patient.patient_id})!`;
+          document.getElementById('success-msg').style.display = '';
+          document.getElementById('patient-form').reset();
+        } else {
+          const err = await res.json();
+          document.getElementById('error-msg').textContent = err.error || 'Failed to add patient';
+          document.getElementById('error-msg').style.display = '';
+        }
+      } catch (err) {
+        document.getElementById('error-msg').textContent = err.message;
+        document.getElementById('error-msg').style.display = '';
+      }
+    });
+  </script>
+</body>
+</html>

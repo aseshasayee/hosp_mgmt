@@ -1,0 +1,153 @@
+MSH|^~\&|TEST|TEST|DCM4CHEE|DCM4CHEE|20250604||ORM^O01|12345|P|2.3
+PID|1||PID_1||no^Drake^Mark||20141014|F
+ORC|NW|ORDER12345
+OBR|1|ORDER12345|ACC12345|CT^CT SCAN
+
+
+MSH|^~\&|TESTAPP|TESTFAC|DCM4CHEE|DCM4CHEE|20250605||ORM^O01|MSGID1|P|2.3
+PID|1||PAT123^^^DCM4CHEE||Doe^Jane||19900101|F
+ORC|NW|ORDER123
+OBR|1|ORDER123|ACC123|US^ULTRASOUND
+
+MSH|^~\&|TEST|TEST|DCM4CHEE|DCM4CHEE|20250604160000||OMI^O23^OMI_O23|12345|P|2.3||||||8859/1||
+PID|||PID_146832||No^Mir^Mark||20141014|F|||123 Main St^^Metropolis^NY^12345^USA|||||||ADM987654321||||||||||||||||||||
+NTE|||Patient has allergy to penicillin.||
+PV1||I||||||^Williams^James^Robert^^DR^MD|||||||B12||||ADM20250604||||||||||||||||||||||||||||||||V|
+ORC|NW|PLACERORD56789|FILLERORD98765||SC||^^^^^R||||||||||HOSP123^General Hospital^CCN|||||456 Hospital Rd^^Metropolis^NY^12345^USA||||
+TQ1|||||||20250604153000||
+OBR||PLACERORD56789 |FILLERORD98765|12345-6^Chest X-Ray^LN||||||||PatientStable|No known medical alerts|||^Adams^Sarah^Marie^^DR^MD||||||||||||||PatientTransportAmbulance|D1234^Chronic obstructive pulmonary disease^ICD10|||^Brown^Michael^Lee^^DR^MD||||||||||12345-6^Chest X-Ray^LN|
+OBX|1|ST|^Body Weight||70|kg|||||F||||||
+OBX|2|ST|^Body Height||1.75|m|||||F||||||
+IPC|ACC20250604|REQPROC56789|1.2.840.113619.2.55.3.604688432.20250604160000|SPID12345|XR|12345-6^Chest X-Ray^LN|RadiologyDept|Room101|RAD1~RAD2
+
+
+MSH|^~\&|TEST|TEST|DCM4CHEE|DCM4CHEE|20250608093808||OMI^O23^OMI_O23|0857008cccc2470|P|2.3||||||8859/1
+PID|||02716226-3cbb-4d4d-b257-e32ac671dfb2||noise^purple||19990623000000|M|||23|||||0857008cccc2470
+NTE|||No known allergies
+PV1||I||||||^doctor1^^^DR^MD||||||B12||||ADM20250608||||||||||V
+ORC|NW|PLACER0857008c|FILLERb38fbf6d||SC|^^^^^R||||||||HOSP123^General Hospital^CCN||||456 Hospital Rd^^Metropolis^NY^12345^USA
+TQ1|||||||20250608093808||
+OBR||PLACER0857008c|FILLERb38fbf6d|12345-6^Chest X-Ray^LN|||||||PatientStable|No known medical alerts|||^doctor1^^^DR^MD|||||||||PatientTransportAmbulance|D1234^Chronic obstructive pulmonary disease^ICD10|||^doctor1^^^DR^MD||||||12345-6^Chest X-Ray^LN
+OBX|1|ST|^Body Weight||70|kg|||||F||||||
+OBX|2|ST|^Body Height||1.75|m|||||F||||||
+IPC|ACC20250608|REQPROC0857008c|1.2.840.113619.2.55.3.0857008c-ccc|SPID02716226|X-Ray|12345-6^Chest X-Ray^LN|Radiology|Room101|RAD1~RAD2
+
+MSH|^~\&|MESA_OF|XYZ_RADIOLOGY|MESA_IM|XYZ_IMAGE_MANAGER|20220324193155||OMI^O23^OMI_O23|1001125|P|2.5.1||||||8859/1||
+PID|||PID_1^^^ADT1||Smith^Lcy^Mark||20141014|F|||PatientAddress|||||||AdmissionIDFromPatientAccountNo||||||||||||||||||||
+NTE|||PatientComments||
+PV1||E||||||^ReferringPhysicianFN^ReferringPhysicianGN^ReferringPhysicianMN^^DR^Md|||||||B6||||AdmissionIDFromVisitNo||||||||||||||||||||||||||||||||V|
+ORC|NW|PlacerOrderNumberImagingServiceRequest|FillerOrderNumberImagingServiceRequest||SC||^^^^^RequestedProcedurePriority||||||||||HospID_1^Hospital1^CCN|||||InstitutionAddress|||||
+TQ1|||||||200008161510||
+OBR||PlacerOrderNumberImagingServiceRequest|FillerOrderNumberImagingServiceRequest|10637-7^Microscopic Observation^LN||||||||PatientState|MedicalAlerts|||^RequestingPhysicianFN^RequestingPhysicianGN^RequestingPhysicianMN^^DR^Md||||||||||||||PatientTransportArrangements|D1304^Rheumatoid, other arthritis with motor score from 12 –35.,comorbidity in tier 3^HIPPS|||ScheduledPerformingPhysicianNameFN^ScheduledPerformingPhysicianNameGN^ScheduledPerformingPhysicianNameMN^^DR^Md||||||||||10637-7^Microscopic Observation^LN|
+OBX|1|ST|^Body Weight||65|kg|||||F||||||
+OBX|2|ST|^Body Height||1.65|m|||||F||||||
+NTE|||RequestedProcedureComments||||
+IPC|AccessionNumber|RequestedProcID|1.2.392.200036.9125.0.198811291108.7|ScheduledProcStepID|CT|10637-7^Microscopic Observation^LN|ScheduledStationName|ScheduledProcStepLocation|ScheduledStationAET1~ScheduledStationAET2
+
+
+// server.js
+const express = require('express');
+const bodyParser = require('body-parser');
+const db = require('./db');
+const net = require('net');
+
+const app = express();
+app.use(bodyParser.json());
+
+// Utility: Safely format birthdate for HL7 (YYYYMMDD)
+function formatHL7Birthdate(birthdate) {
+  if (!birthdate) return '';
+  if (typeof birthdate === 'string') {
+    return birthdate.replace(/-/g, '');
+  }
+  if (birthdate instanceof Date) {
+    return birthdate.getFullYear().toString().padStart(4, '0') +
+           (birthdate.getMonth() + 1).toString().padStart(2, '0') +
+           birthdate.getDate().toString().padStart(2, '0');
+  }
+  return String(birthdate).replace(/-/g, '');
+}
+
+function generateHL7Order(patient) {
+  // Fixed values from your example
+  const mshDate = '20250604';  // Hardcoded as per sample
+  const orderId = '12345';      // Fixed order number
+  const accession = 'ACC12345'; // Fixed accession number
+
+  // Split name into components (Last^First^Middle)
+  const [last, first, middle] = patient.patient_name.split(' ');
+  const nameHL7 = [last, first, middle].filter(Boolean).join('^');
+
+  // Format birthdate as YYYYMMDD
+  const birthdate = new Date(patient.patient_birthdate);
+  const birthdateStr = birthdate.toISOString().slice(0,10).replace(/-/g, '');
+
+  // Use \n as separator, NO trailing blank lines
+  return [
+    `MSH|^~\\&|TEST|TEST|DCM4CHEE|DCM4CHEE|${mshDate}||ORM^O01|${orderId}|P|2.3`,
+    `PID|1||${patient.patient_id}||${nameHL7}||${birthdateStr}|${patient.patient_sex}`,
+    `ORC|NW|ORDER12345`,
+    `OBR|1|ORDER12345|${accession}|CT^CT SCAN`
+  ].join('\n');
+}
+
+
+// Get all simple patients
+app.get('/api/simple_patients', async (req, res) => {
+  try {
+    const result = await db.query('SELECT * FROM simple_patient ORDER BY id');
+    res.json(result.rows);
+  } catch (err) {
+    res.status(500).send('Database error: ' + err.message);
+  }
+});
+
+// Add a new simple patient
+app.post('/api/simple_patients', async (req, res) => {
+  const { patient_id, patient_name, patient_sex, patient_birthdate } = req.body;
+  try {
+    const result = await db.query(
+      'INSERT INTO simple_patient (patient_id, patient_name, patient_sex, patient_birthdate) VALUES ($1, $2, $3, $4) RETURNING *',
+      [patient_id, patient_name, patient_sex, patient_birthdate]
+    );
+    res.status(201).json(result.rows[0]);
+  } catch (err) {
+    res.status(500).send('Insert error: ' + err.message);
+  }
+});
+
+// Place an order and send HL7 to dcm4chee
+app.post('/api/orders', async (req, res) => {
+  const { patient_id, scan } = req.body;
+  try {
+    const result = await db.query('SELECT * FROM simple_patient WHERE patient_id = $1', [patient_id]);
+    if (result.rows.length === 0) return res.status(404).send('Patient not found');
+    const patient = result.rows[0];
+
+    const hl7 = generateHL7Order(patient, scan);
+
+    // Log HL7 message to console for debugging
+    console.log('Generated HL7 message:\n' + hl7.replace(/\r/g, '\n'));
+
+    // Send HL7 over MLLP to dcm4chee
+    const clientSocket = new net.Socket();
+    clientSocket.connect(2575, 'localhost', () => {
+      clientSocket.write('\x0b' + hl7 + '\x1c\r');
+    });
+    clientSocket.on('data', (data) => {
+      res.send({
+        message: 'Order sent!',
+        ack: data.toString(),
+        hl7: hl7
+      });
+      clientSocket.destroy();
+    });
+    clientSocket.on('error', (err) => {
+      res.status(500).send('Failed to send HL7: ' + err.message);
+    });
+  } catch (err) {
+    res.status(500).send('Order error: ' + err.message);
+  }
+});
+
+app.listen(5000, () => console.log('Server running on port 5000'));

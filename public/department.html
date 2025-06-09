@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Department Dashboard</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #f8fafd; }
+    .container { max-width: 1100px; margin: 2em auto; background: #fff; border-radius: 8px; padding: 2em; }
+    h2 { color: #2c3e50; }
+    .worklist, .history { margin-bottom: 2em; }
+    table { width: 100%; border-collapse: collapse; margin-top: 1em; }
+    th, td { padding: 0.7em; border: 1px solid #ddd; text-align: left; }
+    th { background: #f8f9fa; }
+    .btn { padding: 0.7em 1.5em; background: #3498db; color: #fff; border: none; border-radius: 4px; cursor: pointer; }
+    .btn-done { background: #27ae60; }
+    .success { color: green; }
+    .error { color: red; }
+  </style>
+</head>
+<body>
+  <script>
+    // Protect the page: Only department users can access
+    const token = localStorage.getItem('token');
+    if (!token) window.location.href = '/login.html';
+    function parseJwt(token) {
+      try { return JSON.parse(atob(token.split('.')[1])); } catch (e) { return {}; }
+    }
+    const user = parseJwt(token);
+    if (user.role !== 'department') window.location.href = '/login.html';
+    const department_id = user.department_id;
+  </script>
+  <div class="container">
+    <h2>Department Dashboard</h2>
+    <div class="worklist">
+      <h3>Pending Worklist</h3>
+      <div id="worklistTable"></div>
+    </div>
+    <div class="history">
+      <h3>Completed Orders</h3>
+      <button class="btn" onclick="loadCompleted()">Refresh</button>
+      <div id="historyTable"></div>
+    </div>
+  </div>
+  <script>
+    // Load worklist for this department
+    async function loadWorklist() {
+      const res = await fetch('/department/worklist', { headers: { 'Authorization': 'Bearer ' + token } });
+      const orders = await res.json();
+      const div = document.getElementById('worklistTable');
+      if (!orders.length) {
+        div.innerHTML = '<i>No pending orders.</i>';
+        return;
+      }
+      div.innerHTML = `
+        <table>
+          <thead>
+            <tr>
+              <th>Patient</th><th>Reason</th><th>Modality</th><th>Doctor</th><th>Created</th><th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${orders.map(o => `
+              <tr>
+                <td>${o.first_name} ${o.last_name}</td>
+                <td>${o.reason || '-'}</td>
+                <td>${o.modality_name || '-'}</td>
+                <td>${o.doctor_name || '-'}</td>
+                <td>${new Date(o.created_at).toLocaleString()}</td>
+                <td><button class="btn btn-done" onclick="markDone('${o.order_id}')">Mark as Done</button></td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      `;
+    }
+
+    // Mark order as done
+    async function markDone(order_id) {
+      if (!confirm('Mark this order as completed?')) return;
+      const res = await fetch('/department/order/' + order_id + '/complete', {
+        method: 'POST',
+        headers: { 'Authorization': 'Bearer ' + token }
+      });
+      if (res.ok) {
+        loadWorklist();
+        loadCompleted();
+      }
+    }
+
+    // Load completed orders
+    async function loadCompleted() {
+      const res = await fetch('/department/orders/completed', { headers: { 'Authorization': 'Bearer ' + token } });
+      const orders = await res.json();
+      const div = document.getElementById('historyTable');
+      if (!orders.length) {
+        div.innerHTML = '<i>No completed orders.</i>';
+        return;
+      }
+      div.innerHTML = `
+        <table>
+          <thead>
+            <tr>
+              <th>Patient</th><th>Reason</th><th>Modality</th><th>Doctor</th><th>Completed At</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${orders.map(o => `
+              <tr>
+                <td>${o.first_name} ${o.last_name}</td>
+                <td>${o.reason || '-'}</td>
+                <td>${o.modality_name || '-'}</td>
+                <td>${o.doctor_name || '-'}</td>
+                <td>${new Date(o.created_at).toLocaleString()}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      `;
+    }
+
+    loadWorklist();
+    loadCompleted();
+  </script>
+</body>
+</html>

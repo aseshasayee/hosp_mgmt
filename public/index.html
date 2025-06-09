@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>HL7 Order Entry</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body { 
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+    
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+      overflow: hidden;
+    }
+    
+    .header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 30px;
+      text-align: center;
+      position: relative;
+    }
+    
+    .header::before {
+      content: '🏥';
+      position: absolute;
+      left: 30px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 24px;
+    }
+    
+    .header h2 {
+      font-size: 28px;
+      font-weight: 600;
+      margin: 0;
+    }
+    
+    .header p {
+      margin-top: 8px;
+      opacity: 0.9;
+      font-size: 16px;
+    }
+    
+    .form-container {
+      padding: 40px;
+    }
+    
+    .form-section {
+      margin-bottom: 30px;
+    }
+    
+    .section-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: #2c3e50;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .form-group { 
+      margin-bottom: 25px;
+    }
+    
+    label { 
+      display: block; 
+      font-weight: 600; 
+      margin-bottom: 8px; 
+      color: #34495e;
+      font-size: 14px;
+    }
+    
+    select, button {
+      width: 100%; 
+      padding: 15px 20px; 
+      border: 2px solid #e1e8ed; 
+      border-radius: 12px; 
+      font-size: 16px; 
+      transition: all 0.3s ease;
+      background: white;
+    }
+    
+    select:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+    
+    select:disabled {
+      background: #f8f9fa;
+      color: #6c757d;
+      cursor: not-allowed;
+    }
+    
+    button { 
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white; 
+      border: none; 
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 18px;
+      padding: 18px;
+      margin-top: 20px;
+      transition: all 0.3s ease;
+    }
+    
+    button:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+    }
+    
+    button:disabled { 
+      background: #bdc3c7;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+    
+    #patient-info { 
+      background: linear-gradient(135deg, #e8f5ff 0%, #f0f8ff 100%);
+      padding: 25px; 
+      border-radius: 15px; 
+      margin: 20px 0;
+      border: 2px solid #e3f2fd;
+    }
+    
+    #patient-info h3 {
+      color: #1565c0;
+      margin-bottom: 15px;
+      font-size: 18px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    #patient-info h3::before {
+      content: '👤';
+      font-size: 20px;
+    }
+    
+    .patient-detail {
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .patient-detail strong {
+      color: #2c3e50;
+      min-width: 80px;
+    }
+    
+    .result-section {
+      background: #f8f9fa;
+      padding: 30px 40px;
+      border-top: 1px solid #e9ecef;
+    }
+    
+    .result-section h3 {
+      color: #2c3e50;
+      margin-bottom: 20px;
+      font-size: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .result-section h3::before {
+      content: '📊';
+      font-size: 22px;
+    }
+    
+    pre { 
+      background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+      color: #ecf0f1;
+      padding: 25px; 
+      border-radius: 12px; 
+      overflow-x: auto;
+      font-family: 'Consolas', 'Monaco', monospace;
+      font-size: 14px;
+      line-height: 1.6;
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .loading {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid #f3f3f3;
+      border-top: 3px solid #667eea;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-right: 10px;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    .icon-patient::before { content: '👤'; margin-right: 8px; }
+    .icon-department::before { content: '🏢'; margin-right: 8px; }
+    .icon-modality::before { content: '🔬'; margin-right: 8px; }
+    .icon-doctor::before { content: '👨‍⚕️'; margin-right: 8px; }
+    
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    
+    @media (max-width: 768px) {
+      .form-row {
+        grid-template-columns: 1fr;
+      }
+      
+      .container {
+        margin: 10px;
+        border-radius: 15px;
+      }
+      
+      .header, .form-container, .result-section {
+        padding: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h2>Create New Imaging Order</h2>
+      <p>HL7 Order Entry System</p>
+    </div>
+    
+    <div class="form-container">
+      <div class="form-section">
+        <div class="section-title icon-patient">Patient Selection</div>
+        <div class="form-group">
+          <label for="patient-select">Select Patient:</label>
+          <select id="patient-select">
+            <option value="">Loading patients...</option>
+          </select>
+        </div>
+        <div id="patient-info" style="display:none;">
+          <h3>Patient Information</h3>
+          <div id="patient-details"></div>
+        </div>
+      </div>
+      
+      <div class="form-section">
+        <div class="section-title icon-department">Department & Modality</div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="department-select">Select Department:</label>
+            <select id="department-select">
+              <option value="">Loading departments...</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="modality-select">Select Modality/Test:</label>
+            <select id="modality-select" disabled>
+              <option value="">First select a department</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      
+      <div class="form-group" id="doctor-group" style="display:none;">
+        <div class="section-title icon-doctor">Doctor Selection</div>
+        <label for="doctor-select">Select Doctor:</label>
+        <select id="doctor-select">
+          <option value="">Loading doctors...</option>
+        </select>
+      </div>
+      
+      <button id="send-btn" disabled>
+        <span id="button-text">Send HL7 Order</span>
+      </button>
+    </div>
+    
+    <div class="result-section">
+      <h3>HL7 Transaction Result</h3>
+      <pre id="result">Waiting for order submission...</pre>
+    </div>
+  </div>
+
+  <script>
+    // Parse JWT to get user info
+    const token = localStorage.getItem('token');
+    let doctorId = null, userRole = null;
+    if (token) {
+      try {
+        const user = JSON.parse(atob(token.split('.')[1]));
+        userRole = user.role;
+        if (userRole === 'doctor') doctorId = user.doctor_id;
+      } catch (e) {}
+    }
+
+    // Populate dropdowns
+    fetch('/patients', { headers: { 'Authorization': 'Bearer ' + token } }).then(r => r.json()).then(patients => {
+      const sel = document.getElementById('patient-select');
+      sel.innerHTML = '<option value="">Select patient</option>';
+      patients.forEach(p => {
+        const o = document.createElement('option');
+        o.value = p.patient_id;
+        o.textContent = `${p.first_name} ${p.last_name} (ID: ${p.patient_id})`;
+        sel.appendChild(o);
+      });
+    });
+
+    fetch('/departments', { headers: { 'Authorization': 'Bearer ' + token } }).then(r => r.json()).then(depts => {
+      const sel = document.getElementById('department-select');
+      sel.innerHTML = '<option value="">Select department</option>';
+      depts.forEach(d => {
+        const o = document.createElement('option');
+        o.value = d.department_id;
+        o.textContent = d.name;
+        sel.appendChild(o);
+      });
+    });
+
+    // If management, show doctor dropdown
+    if (userRole === 'management') {
+      document.getElementById('doctor-group').style.display = '';
+      fetch('/doctors', { headers: { 'Authorization': 'Bearer ' + token } }).then(r => r.json()).then(doctors => {
+        const sel = document.getElementById('doctor-select');
+        sel.innerHTML = '<option value="">Select doctor</option>';
+        doctors.forEach(d => {
+          const o = document.createElement('option');
+          o.value = d.doctor_id;
+          o.textContent = `${d.name} (${d.specialization || ''})`;
+          sel.appendChild(o);
+        });
+      });
+      document.getElementById('doctor-select').addEventListener('change', enableSendBtn);
+    }
+
+    // Patient info
+    document.getElementById('patient-select').addEventListener('change', async e => {
+      const pid = e.target.value;
+      if (!pid) { document.getElementById('patient-info').style.display = 'none'; return; }
+      const p = await fetch(`/patient/${pid}`, { headers: { 'Authorization': 'Bearer ' + token } }).then(r => r.json());
+      document.getElementById('patient-details').innerHTML = `
+        <div class="patient-detail"><strong>Name:</strong> ${p.first_name} ${p.last_name}</div>
+        <div class="patient-detail"><strong>DOB:</strong> ${p.dob}</div>
+        <div class="patient-detail"><strong>Sex:</strong> ${p.sex}</div>
+        <div class="patient-detail"><strong>Allergies:</strong> ${p.allergies || 'None'}</div>
+        <div class="patient-detail"><strong>Address:</strong> ${p.address}</div>
+      `;
+      document.getElementById('patient-info').style.display = '';
+      enableSendBtn();
+    });
+
+    // Department -> Modality
+    document.getElementById('department-select').addEventListener('change', async e => {
+      const did = e.target.value;
+      const sel = document.getElementById('modality-select');
+      if (!did) { sel.innerHTML = '<option value="">First select a department</option>'; sel.disabled = true; return; }
+      const mods = await fetch(`/modalities/${did}`, { headers: { 'Authorization': 'Bearer ' + token } }).then(r => r.json());
+      sel.innerHTML = '<option value="">Select modality/test</option>';
+      mods.forEach(m => {
+        const o = document.createElement('option');
+        o.value = m.modality_id;
+        o.textContent = m.name;
+        sel.appendChild(o);
+      });
+      sel.disabled = false;
+      enableSendBtn();
+    });
+
+    document.getElementById('modality-select').addEventListener('change', enableSendBtn);
+    function enableSendBtn() {
+      const patient = document.getElementById('patient-select').value;
+      const dept = document.getElementById('department-select').value;
+      const mod = document.getElementById('modality-select').value;
+      let docOk = true;
+      if (userRole === 'management') {
+        docOk = !!document.getElementById('doctor-select').value;
+      }
+      document.getElementById('send-btn').disabled = !(patient && dept && mod && docOk);
+    }
+
+    // Send HL7
+    document.getElementById('send-btn').addEventListener('click', async () => {
+      const patientId = document.getElementById('patient-select').value;
+      const departmentId = document.getElementById('department-select').value;
+      const modalityId = document.getElementById('modality-select').value;
+      let doctorIdToSend = doctorId;
+      if (userRole === 'management') {
+        doctorIdToSend = document.getElementById('doctor-select').value;
+      }
+      
+      document.getElementById('result').textContent = 'Sending HL7...';
+      document.getElementById('button-text').innerHTML = '<div class="loading"></div>Processing...';
+      document.getElementById('send-btn').disabled = true;
+      
+      try {
+        const res = await fetch('/send_custom', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+          body: JSON.stringify({ patientId, departmentId, modalityId, doctorId: doctorIdToSend })
+        });
+        const txt = await res.text();
+        document.getElementById('result').textContent = txt;
+      } catch (err) {
+        document.getElementById('result').textContent = 'Error: ' + err.message;
+      } finally {
+        document.getElementById('button-text').textContent = 'Send HL7 Order';
+        enableSendBtn();
+      }
+    });
+  </script>
+</body>
+</html>
