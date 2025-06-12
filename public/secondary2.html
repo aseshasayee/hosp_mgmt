@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Medical Physical Examination Form</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 900px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #f0f0f0;
+        }
+        
+        .form-container {
+            background-color: white;
+            border: 2px solid #8b7db8;
+            display: flex;
+            min-height: 600px;
+            position: relative;
+        }
+        
+        .sidebar {
+            background-color: #8b7db8;
+            width: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        
+        .sidebar-text {
+            color: white;
+            font-weight: bold;
+            font-size: 14px;
+            writing-mode: vertical-rl;
+            text-orientation: mixed;
+            letter-spacing: 2px;
+        }
+        
+        .form-content {
+            flex: 1;
+            padding: 20px 30px;
+        }
+        
+        .section {
+            margin-bottom: 25px;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 15px;
+        }
+        
+        .section:last-child {
+            border-bottom: none;
+        }
+        
+        .section-title {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+        
+        .text-area {
+            width: 100%;
+            min-height: 80px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            resize: vertical;
+            font-family: inherit;
+            padding: 10px;
+            font-size: 14px;
+            background-color: #fafafa;
+            box-sizing: border-box;
+        }
+        
+        .text-area::placeholder {
+            color: #999;
+            font-style: italic;
+        }
+        
+        .large-text-area {
+            min-height: 120px;
+        }
+        
+        .general-examination {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 15px;
+            margin: 15px 0;
+        }
+        
+        .general-item {
+            text-align: center;
+            padding: 15px 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background-color: #fafafa;
+        }
+        
+        .general-item label {
+            font-weight: bold;
+            font-size: 12px;
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+        }
+        
+        .radio-group {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .radio-item {
+            display: flex;
+            align-items: center;
+            gap: 3px;
+            font-size: 12px;
+        }
+        
+        .radio-item input[type="radio"] {
+            width: 14px;
+            height: 14px;
+            accent-color: #8b7db8;
+        }
+        
+        .radio-item label {
+            font-weight: normal;
+            margin-bottom: 0;
+            cursor: pointer;
+        }
+        
+        .examination-details {
+            font-size: 12px;
+            color: #666;
+            font-style: italic;
+            margin-bottom: 8px;
+        }
+        
+        .text-area:focus {
+            outline: none;
+            border-color: #8b7db8;
+            background-color: white;
+        }
+        
+        .page-number {
+            text-align: center;
+            margin-top: 20px;
+            color: #666;
+        }
+        
+
+        
+        @media (max-width: 768px) {
+            .general-examination {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .form-content {
+                padding: 15px 20px;
+            }
+        }
+        
+        @media print {
+            body {
+                background-color: white;
+                margin: 0;
+                padding: 10px;
+            }
+            .form-container {
+                border: 1px solid #000;
+            }
+            .button-section {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="form-container">
+        <div class="sidebar">
+            <div class="sidebar-text">PHYSICAL SECONDARY ASSESSMENT</div>
+        </div>
+        <div class="form-content">
+            <!-- General Examination -->
+            <div class="section">
+                <div class="section-title">General Examination</div>
+                <div class="general-examination">
+                    <div class="general-item">
+                        <label>Pallor</label>
+                        <div class="radio-group">
+                            <div class="radio-item">
+                                <input type="radio" name="pallor" id="pallor_yes" value="yes">
+                                <label for="pallor_yes">Yes</label>
+                            </div>
+                            <div class="radio-item">
+                                <input type="radio" name="pallor" id="pallor_no" value="no">
+                                <label for="pallor_no">No</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="general-item">
+                        <label>Icterus</label>
+                        <div class="radio-group">
+                            <div class="radio-item">
+                                <input type="radio" name="icterus" id="icterus_yes" value="yes">
+                                <label for="icterus_yes">Yes</label>
+                            </div>
+                            <div class="radio-item">
+                                <input type="radio" name="icterus" id="icterus_no" value="no">
+                                <label for="icterus_no">No</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="general-item">
+                        <label>Cyanosis</label>
+                        <div class="radio-group">
+                            <div class="radio-item">
+                                <input type="radio" name="cyanosis" id="cyanosis_yes" value="yes">
+                                <label for="cyanosis_yes">Yes</label>
+                            </div>
+                            <div class="radio-item">
+                                <input type="radio" name="cyanosis" id="cyanosis_no" value="no">
+                                <label for="cyanosis_no">No</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="general-item">
+                        <label>Clubbing</label>
+                        <div class="radio-group">
+                            <div class="radio-item">
+                                <input type="radio" name="clubbing" id="clubbing_yes" value="yes">
+                                <label for="clubbing_yes">Yes</label>
+                            </div>
+                            <div class="radio-item">
+                                <input type="radio" name="clubbing" id="clubbing_no" value="no">
+                                <label for="clubbing_no">No</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="general-item">
+                        <label>Lymphadenopathy</label>
+                        <div class="radio-group">
+                            <div class="radio-item">
+                                <input type="radio" name="lymphadenopathy" id="lymphadenopathy_yes" value="yes">
+                                <label for="lymphadenopathy_yes">Yes</label>
+                            </div>
+                            <div class="radio-item">
+                                <input type="radio" name="lymphadenopathy" id="lymphadenopathy_no" value="no">
+                                <label for="lymphadenopathy_no">No</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="general-item">
+                        <label>Edema</label>
+                        <div class="radio-group">
+                            <div class="radio-item">
+                                <input type="radio" name="edema" id="edema_yes" value="yes">
+                                <label for="edema_yes">Yes</label>
+                            </div>
+                            <div class="radio-item">
+                                <input type="radio" name="edema" id="edema_no" value="no">
+                                <label for="edema_no">No</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ENT/HEAD & NECK/EYES Examination -->
+            <div class="section">
+                <div class="section-title">ENT/HEAD & NECK/EYES Examination:</div>
+                <textarea class="text-area" id="ent-examination" placeholder="Enter ENT/HEAD & NECK/EYES examination findings..."></textarea>
+            </div>
+
+            <!-- Cardiac Examination -->
+            <div class="section">
+                <div class="section-title">Cardiac Examination:</div>
+                <div class="examination-details">(Pulse, Apex Beat, Parasternal Heave, Heart Sounds, Added Sounds, Murmurs, etc)</div>
+                <textarea class="text-area large-text-area" id="cardiac-examination" placeholder="Enter cardiac examination findings..."></textarea>
+            </div>
+
+            <!-- Chest/Breast Examination -->
+            <div class="section">
+                <div class="section-title">Chest/Breast Examination:</div>
+                <div class="examination-details">(Chest Expansion, Percussion, Chest Compression, Breath Sounds, etc)</div>
+                <textarea class="text-area large-text-area" id="chest-examination" placeholder="Enter chest/breast examination findings..."></textarea>
+            </div>
+
+            <!-- Abdomen/Back Examination -->
+            <div class="section">
+                <div class="section-title">Abdomen/Back Examination:</div>
+                <div class="examination-details">(General Appearance, Umbilicus, Organomegaly, percussion, Bowel sounds, External Genitalia, Hernia Orifices, P/R Examination, P/V Examination, etc)</div>
+                <textarea class="text-area large-text-area" id="abdomen-examination" placeholder="Enter abdomen/back examination findings..."></textarea>
+            </div>
+
+            <!-- Neurological Examination -->
+            <div class="section">
+                <div class="section-title">Neurological Examination:</div>
+                <div class="examination-details">(Higher Mental Functions, Cranial nerves, Sensory System, Motor System, Romberg's Sign, Cerebellar Signs, Signs of Meningeal Irritation, Gait, Carotid Bruit, etc)</div>
+                <textarea class="text-area large-text-area" id="neuro-examination" placeholder="Enter neurological examination findings..."></textarea>
+            </div>
+
+
+            
+            <div class="page-number">4</div>
+        </div>
+    </div>
+
+    <script>
+        // Global variable to store form data
+        window.medicalExaminationData = {};
+
+        function showStatusMessage(message, type = 'success') {
+            const statusEl = document.getElementById('statusMessage');
+            statusEl.textContent = message;
+            statusEl.className = `status-message ${type} show`;
+            
+            setTimeout(() => {
+                statusEl.classList.remove('show');
+            }, 3000);
+        }
+
+        function collectFormData() {
+            // Collect general examination data
+            const generalExamination = {};
+            const radioGroups = ['pallor', 'icterus', 'cyanosis', 'clubbing', 'lymphadenopathy', 'edema'];
+            
+            radioGroups.forEach(group => {
+                const selectedRadio = document.querySelector(`input[name="${group}"]:checked`);
+                generalExamination[group] = selectedRadio ? selectedRadio.value : '';
+            });
+
+            // Collect examination text data
+            const examinations = {
+                entExamination: document.getElementById('ent-examination').value,
+                cardiacExamination: document.getElementById('cardiac-examination').value,
+                chestExamination: document.getElementById('chest-examination').value,
+                abdomenExamination: document.getElementById('abdomen-examination').value,
+                neurologicalExamination: document.getElementById('neuro-examination').value
+            };
+
+            return {
+                generalExamination,
+                examinations,
+                timestamp: new Date().toISOString(),
+                formattedTimestamp: new Date().toLocaleString()
+            };
+        }
+
+        function saveForm() {
+            try {
+                const formData = collectFormData();
+                
+                // Store in memory
+                window.medicalExaminationData = formData;
+                
+                showStatusMessage('Physical examination form saved successfully!', 'success');
+                console.log('Saved physical examination data:', formData);
+                
+                return true;
+            } catch (error) {
+                console.error('Error saving form:', error);
+                showStatusMessage('Error saving form. Please try again.', 'error');
+                return false;
+            }
+        }
+        
+        function printForm() {
+            try {
+                // Save before printing
+                saveForm();
+                window.print();
+            } catch (error) {
+                console.error('Error printing form:', error);
+                showStatusMessage('Error printing form. Please try again.', 'error');
+            }
+        }
+
+        function clearForm() {
+            if (confirm('Are you sure you want to clear all form data? This action cannot be undone.')) {
+                // Clear all radio buttons
+                const radios = document.querySelectorAll('input[type="radio"]');
+                radios.forEach(radio => radio.checked = false);
+                
+                // Clear all textareas
+                const textareas = document.querySelectorAll('textarea');
+                textareas.forEach(textarea => textarea.value = '');
+                
+                // Clear stored data
+                window.medicalExaminationData = {};
+                
+                showStatusMessage('Form cleared successfully!', 'success');
+            }
+        }
+        
+        // Auto-save functionality with error handling
+        function initializeAutoSave() {
+            const textareas = document.querySelectorAll('textarea');
+            const radios = document.querySelectorAll('input[type="radio"]');
+            
+            textareas.forEach(textarea => {
+                textarea.addEventListener('input', function() {
+                    // Clear previous timeout
+                    if (this.saveTimeout) {
+                        clearTimeout(this.saveTimeout);
+                    }
+                    
+                    // Auto-save after 3 seconds of inactivity
+                    this.saveTimeout = setTimeout(() => {
+                        try {
+                            const formData = collectFormData();
+                            window.medicalExaminationData = formData;
+                            console.log('Auto-saved examination data');
+                        } catch (error) {
+                            console.error('Auto-save error:', error);
+                        }
+                    }, 3000);
+                });
+            });
+            
+            radios.forEach(radio => {
+                radio.addEventListener('change', function() {
+                    console.log('General examination selection changed:', this.name, this.value);
+                    // Auto-save immediately on radio button change
+                    try {
+                        const formData = collectFormData();
+                        window.medicalExaminationData = formData;
+                    } catch (error) {
+                        console.error('Auto-save error:', error);
+                    }
+                });
+            });
+        }
+        
+        // Keyboard shortcuts
+        function initializeKeyboardShortcuts() {
+            document.addEventListener('keydown', function(e) {
+                // Ctrl+S or Cmd+S to save
+                if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+                    e.preventDefault();
+                    saveForm();
+                }
+                
+                // Ctrl+P or Cmd+P to print (default browser behavior, but ensure save first)
+                if ((e.ctrlKey || e.metaKey) && e.key === 'p') {
+                    saveForm();
+                }
+            });
+        }
+        
+        // Initialize everything when DOM is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            try {
+                initializeAutoSave();
+                initializeKeyboardShortcuts();
+                console.log('Medical examination form initialized successfully');
+            } catch (error) {
+                console.error('Initialization error:', error);
+                showStatusMessage('Form initialization error. Some features may not work properly.', 'error');
+            }
+        });
+
+        // Prevent data loss on page unload
+        window.addEventListener('beforeunload', function(e) {
+            const formData = collectFormData();
+            const hasData = Object.values(formData.generalExamination).some(val => val !== '') ||
+                           Object.values(formData.examinations).some(val => val.trim() !== '');
+            
+            if (hasData && !window.medicalExaminationData.timestamp) {
+                e.preventDefault();
+                e.returnValue = 'You have unsaved changes. Are you sure you want to leave?';
+                return e.returnValue;
+            }
+        });
+    </script>
+</body>
+</html>

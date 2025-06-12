@@ -16,6 +16,13 @@ const app = express();
 app.use(express.json());
 const upload = multer({ dest: 'tmp_reports/' }); // Temporary upload folder
 
+const emergencyRoutes = require('./routes/emergency');
+app.use('/api', emergencyRoutes);
+
+const primaryRoutes = require('./routes/primary');
+app.use('/api', primaryRoutes);
+
+
 // --- Role-based middleware (NEW) ---
 function requireRole(roles) {
   return (req, res, next) => {
@@ -44,6 +51,35 @@ const pool = new Pool({
 app.get('/', (req, res) => {
   res.redirect('/login.html');
 });
+app.get('/', (req, res) => {
+  res.redirect('/login.html');
+});
+
+// ... (all your other functions and endpoints remain unchanged) ...
+
+// --- MODIFIED PATIENT CREATION ENDPOINT ---
+app.post('/patients', async (req, res) => {
+  const { first_name, last_name, dob, sex, address, allergies } = req.body;
+  if (!first_name || !last_name || !dob || !sex || !address) {
+    return res.status(400).json({ error: 'Missing required fields' });
+  }
+  try {
+    // Generate OHIF viewer link
+    const ohifLink = `http://localhost:3000/?patientName=${encodeURIComponent(`${first_name} ${last_name}`)}`;
+
+    // Insert patient with generated link
+    const result = await pool.query(
+      `INSERT INTO patients (first_name, last_name, dob, sex, address, allergies, ohif_viewer_link)
+       VALUES ($1, $2, $3, $4, $5, $6, $7)
+       RETURNING *`,
+      [first_name, last_name, dob, sex, address, allergies || null, ohifLink]
+    );
+    res.status(201).json(result.rows);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 
 function sendHL7ToDcm4chee(hl7Message, host = 'localhost', port = 2575) {
   return new Promise((resolve, reject) => {
@@ -356,8 +392,18 @@ app.get('/api/reports/download/:report_id', async (req, res) => {
   const result = await pool.query('SELECT * FROM reports WHERE report_id = $1', [report_id]);
   if (!result.rows.length) return res.status(404).send('Not found');
   const report = result.rows[0];
-  res.download(path.join(__dirname, report.file_path), report.file_name);
+
+  // Guess content type based on file extension
+  let contentType = 'application/octet-stream';
+  if (report.file_name.endsWith('.pdf')) contentType = 'application/pdf';
+  if (report.file_name.endsWith('.jpg') || report.file_name.endsWith('.jpeg')) contentType = 'image/jpeg';
+  if (report.file_name.endsWith('.png')) contentType = 'image/png';
+
+  res.setHeader('Content-Type', contentType);
+  res.setHeader('Content-Disposition', `inline; filename="${report.file_name}"`);
+  res.sendFile(path.join(__dirname, report.file_path));
 });
+
 
 // Management assigns a visit to a doctor for an existing patient
 app.post('/visits', requireRole(['management']), async (req, res) => {
@@ -536,7 +582,20 @@ app.post('/send_custom', async (req, res) => {
 });
 
 
+app.use(express.static(path.join(__dirname, 'public')));
+// const server = app.listen(5000, () => console.log('Server running on http://localhost:5000'));
 
+// const wss = new WebSocket.Server({ port: 8081 });
+// wss.on('connection', ws => {
+//   console.log('WebSocket client connected');
+// });
+function broadcastNewOrder() {
+  wss.clients.forEach(client => {
+    if (client.readyState === WebSocket.OPEN) {
+      client.send('NEW_ORDER');
+    }
+  });
+}
 app.get('/mwl_orders/:department', async (req, res) => {
   try {
     const client = await pool.connect();
@@ -572,23 +631,23 @@ app.get('/mwl_orders/:department', async (req, res) => {
   }
 });
 
-app.post('/patients', async (req, res) => {
-  const { first_name, last_name, dob, sex, address, allergies } = req.body;
-  if (!first_name || !last_name || !dob || !sex || !address) {
-    return res.status(400).json({ error: 'Missing required fields' });
-  }
-  try {
-    const result = await pool.query(
-      `INSERT INTO patients (first_name, last_name, dob, sex, address, allergies)
-       VALUES ($1, $2, $3, $4, $5, $6)
-       RETURNING *`,
-      [first_name, last_name, dob, sex, address, allergies || null]
-    );
-    res.status(201).json(result.rows);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
+// app.post('/patients', async (req, res) => {
+//   const { first_name, last_name, dob, sex, address, allergies } = req.body;
+//   if (!first_name || !last_name || !dob || !sex || !address) {
+//     return res.status(400).json({ error: 'Missing required fields' });
+//   }
+//   try {
+//     const result = await pool.query(
+//       `INSERT INTO patients (first_name, last_name, dob, sex, address, allergies)
+//        VALUES ($1, $2, $3, $4, $5, $6)
+//        RETURNING *`,
+//       [first_name, last_name, dob, sex, address, allergies || null]
+//     );
+//     res.status(201).json(result.rows);
+//   } catch (err) {
+//     res.status(500).json({ error: err.message });
+//   }
+// });
 
 
 app.post('/doctors', requireRole(['management']), async (req, res) => {

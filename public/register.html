@@ -11,12 +11,30 @@
     
     body { 
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background: linear-gradient(135deg, #f0f4f8 0%, #e3e8ef 100%);
       min-height: 100vh;
       display: flex; 
       align-items: center; 
       justify-content: center;
       padding: 20px;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    body::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%234a90e2' fill-opacity='0.05'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E") repeat;
+      animation: float 20s linear infinite;
+    }
+    
+    @keyframes float {
+      0% { transform: translate(0, 0); }
+      100% { transform: translate(-60px, -60px); }
     }
     
     .register-container {
@@ -29,12 +47,29 @@
       position: relative;
     }
     
+    .hospital-name {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #2c3e50;
+      font-size: 24px;
+      font-weight: 700;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
     .register-header {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%);
       color: white;
       padding: 40px 30px 30px;
       text-align: center;
       position: relative;
+    }
+    
+    .register-header .hospital-name {
+      font-size: 20px;
+      font-weight: 600;
+      margin-bottom: 10px;
+      opacity: 0.95;
+      margin-top: 20px;
     }
     
     .register-header::before {
@@ -45,6 +80,13 @@
       transform: translateX(-50%);
       font-size: 32px;
       opacity: 0.9;
+    }
+    
+    .hospital-logo {
+      width: 80px; /* Adjust as needed */
+      height: 80px; /* Adjust as needed */
+      margin-bottom: 10px;
+      object-fit: contain;
     }
     
     .register-header h2 {
@@ -119,7 +161,7 @@
     button { 
       width: 100%; 
       padding: 18px; 
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%);
       color: white; 
       border: none; 
       border-radius: 12px; 
@@ -134,7 +176,7 @@
     
     button:hover:not(:disabled) {
       transform: translateY(-2px);
-      box-shadow: 0 12px 28px rgba(102, 126, 234, 0.4);
+      box-shadow: 0 12px 28px rgba(74, 144, 226, 0.4);
     }
     
     button:active {
@@ -228,6 +270,7 @@
 <body>
   <div class="register-container">
     <div class="register-header">
+      <div class="hospital-name">Sri Ramachandra Hospital</div>
       <h2>Register User</h2>
       <p>Create a new system account</p>
     </div>

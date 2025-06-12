@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Physical Assessment Form</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f8f9fa;
+        }
+        
+        .form-container {
+            background: white;
+            padding: 0;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .main-section {
+            display: flex;
+            min-height: 500px;
+        }
+        
+        .left-panel {
+            width: 150px;
+            background: linear-gradient(135deg, #8B7CB6, #A084C7);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 14px;
+            padding: 20px 10px;
+            writing-mode: vertical-lr;
+            text-orientation: mixed;
+            text-align: center;
+            letter-spacing: 1px;
+        }
+        
+        .content-area {
+            flex: 1;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            background: white;
+        }
+        
+        .body-diagrams-container {
+            display: flex;
+            gap: 50px;
+            margin-bottom: 30px;
+            justify-content: flex-start;
+        }
+        
+        .body-diagram {
+            position: relative;
+            cursor: crosshair;
+            text-align: center;
+        }
+        
+        .diagram-label {
+            font-weight: 600;
+            font-size: 13px;
+            margin-bottom: 10px;
+            color: #8B7CB6;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .body-svg {
+            width: 140px;
+            height: 350px;
+            border: 2px solid #e9ecef;
+            background: #fefefe;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(139, 124, 182, 0.1);
+        }
+        
+        .findings-section {
+            flex: 1;
+            margin-left: 30px;
+        }
+        
+        .findings-title {
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #495057;
+            font-size: 16px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #8B7CB6;
+        }
+        
+        .findings-area {
+            border: 2px solid #e9ecef;
+            min-height: 200px;
+            padding: 15px;
+            background: #fefefe;
+            white-space: pre-wrap;
+            border-radius: 8px;
+            font-size: 14px;
+            line-height: 1.5;
+            transition: border-color 0.3s ease;
+        }
+        
+        .findings-area:focus {
+            outline: none;
+            border-color: #8B7CB6;
+            box-shadow: 0 0 0 3px rgba(139, 124, 182, 0.1);
+        }
+        
+        .diagnosis-section {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 2px solid #e9ecef;
+        }
+        
+        .diagnosis-title {
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #495057;
+            font-size: 16px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #8B7CB6;
+        }
+        
+        .diagnosis-area {
+            border: 2px solid #e9ecef;
+            min-height: 100px;
+            padding: 15px;
+            background: #fefefe;
+            border-radius: 8px;
+            font-size: 14px;
+            line-height: 1.5;
+            transition: border-color 0.3s ease;
+        }
+        
+        .diagnosis-area:focus {
+            outline: none;
+            border-color: #8B7CB6;
+            box-shadow: 0 0 0 3px rgba(139, 124, 182, 0.1);
+        }
+        
+        .referral-section {
+            margin-top: 30px;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .referral-header {
+            background: linear-gradient(135deg, #8B7CB6, #A084C7);
+            color: white;
+            padding: 15px;
+            font-weight: 600;
+            text-align: center;
+            font-size: 14px;
+            letter-spacing: 0.5px;
+        }
+        
+        .referral-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+        }
+        
+        .referral-table th,
+        .referral-table td {
+            border: 1px solid #e9ecef;
+            padding: 12px 8px;
+            text-align: center;
+            height: 35px;
+        }
+        
+        .referral-table th {
+            background: #f8f9fa;
+            font-weight: 600;
+            font-size: 12px;
+            color: #495057;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+        
+        .referral-table input {
+            width: 100%;
+            border: none;
+            text-align: center;
+            padding: 8px 5px;
+            font-size: 13px;
+            background: transparent;
+            transition: background-color 0.3s ease;
+        }
+        
+        .referral-table input:focus {
+            outline: none;
+            background-color: rgba(139, 124, 182, 0.05);
+        }
+        
+        .signature-section {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+            padding: 20px 0;
+            gap: 20px;
+        }
+        
+        .signature-field {
+            flex: 1;
+        }
+        
+        .field-label {
+            font-weight: 600;
+            margin-bottom: 25px;
+            font-size: 14px;
+            color: #495057;
+        }
+        
+        .field-line {
+            border-bottom: 2px solid #8B7CB6;
+            height: 30px;
+        }
+        
+        .body-part {
+            cursor: pointer;
+            fill: rgba(255, 255, 255, 0.9);
+            stroke: #8B7CB6;
+            stroke-width: 1.5;
+            transition: all 0.3s ease;
+        }
+        
+        .body-part:hover {
+            fill: rgba(139, 124, 182, 0.2);
+            stroke: #7B6FA6;
+            stroke-width: 2;
+            transform: scale(1.02);
+        }
+        
+        .body-part.marked {
+            fill: rgba(139, 124, 182, 0.7) !important;
+            stroke: #6B5996 !important;
+            stroke-width: 2.5 !important;
+            filter: drop-shadow(0 2px 4px rgba(139, 124, 182, 0.3));
+        }
+        
+        .page-number {
+            text-align: center;
+            margin-top: 25px;
+            font-weight: 600;
+            color: #8B7CB6;
+            font-size: 16px;
+        }
+        
+        .top-section {
+            display: flex;
+            align-items: flex-start;
+        }
+        
+        textarea {
+            width: 100%;
+            border: none;
+            resize: none;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 14px;
+            padding: 0;
+            background: transparent;
+            line-height: 1.5;
+        }
+        
+        textarea:focus {
+            outline: none;
+        }
+        
+        .anatomical-line {
+            stroke: #A084C7;
+            stroke-width: 0.8;
+            stroke-dasharray: 3,2;
+            opacity: 0.6;
+        }
+        
+        .body-outline {
+            fill: none;
+            stroke: #8B7CB6;
+            stroke-width: 2;
+        }
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <div class="main-section">
+            <div class="left-panel">
+                PHYSICAL ASSESSMENT CONTROL
+            </div>
+            <div class="content-area">
+                <div class="top-section">
+                    <div class="body-diagrams-container">
+                        <!-- Front View Body Diagram -->
+                        <div class="body-diagram">
+                            <div class="diagram-label">ANTERIOR VIEW</div>
+                            <svg class="body-svg" viewBox="0 0 140 350" id="frontBody">
+                                <!-- Head -->
+                                <ellipse cx="70" cy="25" rx="18" ry="22" class="body-part" data-part="head-front"/>
+                                
+                                <!-- Neck -->
+                                <rect x="62" y="45" width="16" height="18" rx="3" class="body-part" data-part="neck-front"/>
+                                
+                                <!-- Chest/Thorax -->
+                                <path d="M50 63 Q45 65 42 70 L42 95 Q42 100 47 102 L93 102 Q98 100 98 95 L98 70 Q95 65 90 63 Z" 
+                                      class="body-part" data-part="chest-front"/>
+                                
+                                <!-- Left Shoulder -->
+                                <ellipse cx="42" cy="68" rx="8" ry="6" class="body-part" data-part="left-shoulder-front"/>
+                                
+                                <!-- Right Shoulder -->
+                                <ellipse cx="98" cy="68" rx="8" ry="6" class="body-part" data-part="right-shoulder-front"/>
+                                
+                                <!-- Left Upper Arm -->
+                                <ellipse cx="28" cy="95" rx="8" ry="25" class="body-part" data-part="left-upper-arm-front"/>
+                                
+                                <!-- Right Upper Arm -->
+                                <ellipse cx="112" cy="95" rx="8" ry="25" class="body-part" data-part="right-upper-arm-front"/>
+                                
+                                <!-- Left Elbow -->
+                                <ellipse cx="28" cy="125" rx="6" ry="8" class="body-part" data-part="left-elbow-front"/>
+                                
+                                <!-- Right Elbow -->
+                                <ellipse cx="112" cy="125" rx="6" ry="8" class="body-part" data-part="right-elbow-front"/>
+                                
+                                <!-- Left Forearm -->
+                                <ellipse cx="22" cy="150" rx="7" ry="22" class="body-part" data-part="left-forearm-front"/>
+                                
+                                <!-- Right Forearm -->
+                                <ellipse cx="118" cy="150" rx="7" ry="22" class="body-part" data-part="right-forearm-front"/>
+                                
+                                <!-- Left Wrist -->
+                                <ellipse cx="22" cy="175" rx="5" ry="4" class="body-part" data-part="left-wrist-front"/>
+                                
+                                <!-- Right Wrist -->
+                                <ellipse cx="118" cy="175" rx="5" ry="4" class="body-part" data-part="right-wrist-front"/>
+                                
+                                <!-- Left Hand -->
+                                <ellipse cx="22" cy="190" rx="6" ry="12" class="body-part" data-part="left-hand-front"/>
+                                
+                                <!-- Right Hand -->
+                                <ellipse cx="118" cy="190" rx="6" ry="12" class="body-part" data-part="right-hand-front"/>
+                                
+                                <!-- Abdomen -->
+                                <rect x="52" y="102" width="36" height="40" rx="8" class="body-part" data-part="abdomen-front"/>
+                                
+                                <!-- Pelvis -->
+                                <path d="M48 142 Q48 138 52 138 L88 138 Q92 138 92 142 L92 165 Q92 170 88 170 L52 170 Q48 170 48 165 Z" 
+                                      class="body-part" data-part="pelvis-front"/>
+                                
+                                <!-- Left Hip -->
+                                <ellipse cx="52" cy="170" rx="8" ry="10" class="body-part" data-part="left-hip-front"/>
+                                
+                                <!-- Right Hip -->
+                                <ellipse cx="88" cy="170" rx="8" ry="10" class="body-part" data-part="right-hip-front"/>
+                                
+                                <!-- Left Thigh -->
+                                <ellipse cx="52" cy="210" rx="12" ry="35" class="body-part" data-part="left-thigh-front"/>
+                                
+                                <!-- Right Thigh -->
+                                <ellipse cx="88" cy="210" rx="12" ry="35" class="body-part" data-part="right-thigh-front"/>
+                                
+                                <!-- Left Knee -->
+                                <ellipse cx="52" cy="250" rx="10" ry="8" class="body-part" data-part="left-knee-front"/>
+                                
+                                <!-- Right Knee -->
+                                <ellipse cx="88" cy="250" rx="10" ry="8" class="body-part" data-part="right-knee-front"/>
+                                
+                                <!-- Left Leg -->
+                                <ellipse cx="52" cy="285" rx="8" ry="30" class="body-part" data-part="left-leg-front"/>
+                                
+                                <!-- Right Leg -->
+                                <ellipse cx="88" cy="285" rx="8" ry="30" class="body-part" data-part="right-leg-front"/>
+                                
+                                <!-- Left Ankle -->
+                                <ellipse cx="52" cy="318" rx="6" ry="5" class="body-part" data-part="left-ankle-front"/>
+                                
+                                <!-- Right Ankle -->
+                                <ellipse cx="88" cy="318" rx="6" ry="5" class="body-part" data-part="right-ankle-front"/>
+                                
+                                <!-- Left Foot -->
+                                <ellipse cx="52" cy="332" rx="8" ry="12" class="body-part" data-part="left-foot-front"/>
+                                
+                                <!-- Right Foot -->
+                                <ellipse cx="88" cy="332" rx="8" ry="12" class="body-part" data-part="right-foot-front"/>
+                                
+                                <!-- Anatomical reference lines -->
+                                <line x1="70" y1="63" x2="70" y2="142" class="anatomical-line"/>
+                                <line x1="48" y1="80" x2="92" y2="80" class="anatomical-line"/>
+                                <line x1="48" y1="125" x2="92" y2="125" class="anatomical-line"/>
+                            </svg>
+                        </div>
+                        
+                        <!-- Back View Body Diagram -->
+                        <div class="body-diagram">
+                            <div class="diagram-label">POSTERIOR VIEW</div>
+                            <svg class="body-svg" viewBox="0 0 140 350" id="backBody">
+                                <!-- Head Back -->
+                                <ellipse cx="70" cy="25" rx="18" ry="22" class="body-part" data-part="head-back"/>
+                                
+                                <!-- Neck Back -->
+                                <rect x="62" y="45" width="16" height="18" rx="3" class="body-part" data-part="neck-back"/>
+                                
+                                <!-- Upper Back -->
+                                <path d="M50 63 Q45 65 42 70 L42 95 Q42 100 47 102 L93 102 Q98 100 98 95 L98 70 Q95 65 90 63 Z" 
+                                      class="body-part" data-part="upper-back"/>
+                                
+                                <!-- Left Shoulder Back -->
+                                <ellipse cx="42" cy="68" rx="8" ry="6" class="body-part" data-part="left-shoulder-back"/>
+                                
+                                <!-- Right Shoulder Back -->
+                                <ellipse cx="98" cy="68" rx="8" ry="6" class="body-part" data-part="right-shoulder-back"/>
+                                
+                                <!-- Left Upper Arm Back -->
+                                <ellipse cx="28" cy="95" rx="8" ry="25" class="body-part" data-part="left-upper-arm-back"/>
+                                
+                                <!-- Right Upper Arm Back -->
+                                <ellipse cx="112" cy="95" rx="8" ry="25" class="body-part" data-part="right-upper-arm-back"/>
+                                
+                                <!-- Left Elbow Back -->
+                                <ellipse cx="28" cy="125" rx="6" ry="8" class="body-part" data-part="left-elbow-back"/>
+                                
+                                <!-- Right Elbow Back -->
+                                <ellipse cx="112" cy="125" rx="6" ry="8" class="body-part" data-part="right-elbow-back"/>
+                                
+                                <!-- Left Forearm Back -->
+                                <ellipse cx="22" cy="150" rx="7" ry="22" class="body-part" data-part="left-forearm-back"/>
+                                
+                                <!-- Right Forearm Back -->
+                                <ellipse cx="118" cy="150" rx="7" ry="22" class="body-part" data-part="right-forearm-back"/>
+                                
+                                <!-- Left Wrist Back -->
+                                <ellipse cx="22" cy="175" rx="5" ry="4" class="body-part" data-part="left-wrist-back"/>
+                                
+                                <!-- Right Wrist Back -->
+                                <ellipse cx="118" cy="175" rx="5" ry="4" class="body-part" data-part="right-wrist-back"/>
+                                
+                                <!-- Left Hand Back -->
+                                <ellipse cx="22" cy="190" rx="6" ry="12" class="body-part" data-part="left-hand-back"/>
+                                
+                                <!-- Right Hand Back -->
+                                <ellipse cx="118" cy="190" rx="6" ry="12" class="body-part" data-part="right-hand-back"/>
+                                
+                                <!-- Lower Back -->
+                                <rect x="52" y="102" width="36" height="40" rx="8" class="body-part" data-part="lower-back"/>
+                                
+                                <!-- Buttocks -->
+                                <path d="M48 142 Q48 138 52 138 L88 138 Q92 138 92 142 L92 165 Q92 170 88 170 L52 170 Q48 170 48 165 Z" 
+                                      class="body-part" data-part="buttocks"/>
+                                
+                                <!-- Left Hip Back -->
+                                <ellipse cx="52" cy="170" rx="8" ry="10" class="body-part" data-part="left-hip-back"/>
+                                
+                                <!-- Right Hip Back -->
+                                <ellipse cx="88" cy="170" rx="8" ry="10" class="body-part" data-part="right-hip-back"/>
+                                
+                                <!-- Left Thigh Back -->
+                                <ellipse cx="52" cy="210" rx="12" ry="35" class="body-part" data-part="left-thigh-back"/>
+                                
+                                <!-- Right Thigh Back -->
+                                <ellipse cx="88" cy="210" rx="12" ry="35" class="body-part" data-part="right-thigh-back"/>
+                                
+                                <!-- Left Knee Back -->
+                                <ellipse cx="52" cy="250" rx="10" ry="8" class="body-part" data-part="left-knee-back"/>
+                                
+                                <!-- Right Knee Back -->
+                                <ellipse cx="88" cy="250" rx="10" ry="8" class="body-part" data-part="right-knee-back"/>
+                                
+                                <!-- Left Calf -->
+                                <ellipse cx="52" cy="285" rx="8" ry="30" class="body-part" data-part="left-calf-back"/>
+                                
+                                <!-- Right Calf -->
+                                <ellipse cx="88" cy="285" rx="8" ry="30" class="body-part" data-part="right-calf-back"/>
+                                
+                                <!-- Left Ankle Back -->
+                                <ellipse cx="52" cy="318" rx="6" ry="5" class="body-part" data-part="left-ankle-back"/>
+                                
+                                <!-- Right Ankle Back -->
+                                <ellipse cx="88" cy="318" rx="6" ry="5" class="body-part" data-part="right-ankle-back"/>
+                                
+                                <!-- Left Foot Back -->
+                                <ellipse cx="52" cy="332" rx="8" ry="12" class="body-part" data-part="left-foot-back"/>
+                                
+                                <!-- Right Foot Back -->
+                                <ellipse cx="88" cy="332" rx="8" ry="12" class="body-part" data-part="right-foot-back"/>
+                                
+                                <!-- Spine -->
+                                <line x1="70" y1="45" x2="70" y2="142" stroke="#2c3e50" stroke-width="2"/>
+                                
+                                <!-- Shoulder blades -->
+                                <path d="M55 70 Q60 65 65 70 Q60 75 55 80 Q50 75 55 70" fill="none" stroke="#34495e" stroke-width="1"/>
+                                <path d="M85 70 Q80 65 75 70 Q80 75 85 80 Q90 75 85 70" fill="none" stroke="#34495e" stroke-width="1"/>
+                            </svg>
+                        </div>
+                    </div>
+                    
+                    <div class="findings-section">
+                        <div class="findings-title">Local Examination / Additional Physical Findings:</div>
+                        <div class="findings-area" contenteditable="true" id="findingsArea"></div>
+                    </div>
+                </div>
+                
+                <div class="diagnosis-section">
+                    <div class="diagnosis-title">Provisional Diagnosis :</div>
+                    <div class="diagnosis-area" contenteditable="true" id="diagnosisArea"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="referral-section">
+            <div class="referral-header">
+                REFERRAL: (TO BE REQUESTED BY ER PHYSICIAN)
+            </div>
+            <table class="referral-table">
+                <thead>
+                    <tr>
+                        <th rowspan="2">SPECIALITY</th>
+                        <th colspan="2">CALL GIVEN TO</th>
+                        <th colspan="2">SEEN BY</th>
+                    </tr>
+                    <tr>
+                        <th>DOCTOR'S NAME</th>
+                        <th>TIME</th>
+                        <th>DOCTOR'S NAME</th>
+                        <th>TIME</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                    <tr><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                    <tr><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                    <tr><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                    <tr><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                    <tr><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="signature-section">
+            <div class="signature-field">
+                <div class="field-label">Name &Signature:</div>
+                <div class="field-line"></div>
+            </div>
+            <div class="signature-field">
+                <div class="field-label">Date & Time:</div>
+                <div class="field-line"></div>
+            </div>
+            <div class="signature-field">
+                <div class="field-label">DAEP</div>
+                <div class="field-line"></div>
+            </div>
+        </div>
+        
+        <div class="page-number">5</div>
+    </div>
+
+    <script>
+        // Store marked areas
+        let markedAreas = new Set();
+        
+        // Add click event listeners to all body parts
+        document.querySelectorAll('.body-part').forEach(part => {
+            part.addEventListener('click', function(e) {
+                e.preventDefault();
+                const partId = this.getAttribute('data-part');
+                
+                if (markedAreas.has(partId)) {
+                    // Remove mark
+                    markedAreas.delete(partId);
+                    this.classList.remove('marked');
+                } else {
+                    // Add mark
+                    markedAreas.add(partId);
+                    this.classList.add('marked');
+                }
+                
+                // Update findings text
+                updateFindings();
+            });
+        });
+        
+        function updateFindings() {
+            const findingsArea = document.getElementById('findingsArea');
+            if (markedAreas.size > 0) {
+                const markedList = Array.from(markedAreas).map(part => 
+                    part.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())
+                ).join(', ');
+                
+                const currentText = findingsArea.textContent || '';
+                const markedAreasRegex = /Marked areas:.*?(?=\n\n|\n$|$)/s;
+                
+                if (!currentText.includes('Marked areas:')) {
+                    findingsArea.textContent = (currentText ? currentText + '\n\n' : '') + 'Marked areas: ' + markedList;
+                } else {
+                    findingsArea.textContent = currentText.replace(markedAreasRegex, 'Marked areas: ' + markedList);
+                }
+            } else {
+                // Remove marked areas section if no areas are marked
+                const findingsArea = document.getElementById('findingsArea');
+                const currentText = findingsArea.textContent || '';
+                findingsArea.textContent = currentText.replace(/\n\nMarked areas:.*?(?=\n\n|\n$|$)/s, '').replace(/^Marked areas:.*?(?=\n\n|\n$|$)/s, '');
+            }
+        }
+        
+        // Allow clearing all marks with double-click on the SVG
+        document.querySelectorAll('.body-svg').forEach(svg => {
+            svg.addEventListener('dblclick', function(e) {
+                e.preventDefault();
+                markedAreas.clear();
+                document.querySelectorAll('.body-part').forEach(part => {
+                    part.classList.remove('marked');
+                });
+                updateFindings();
+            });
+        });
+        
+        // Prevent text selection when clicking rapidly
+        document.querySelectorAll('.body-diagram').forEach(diagram => {
+            diagram.addEventListener('selectstart', function(e) {
+                e.preventDefault();
+            });
+        });
+    </script>
+</body>
+</html>

@@ -434,7 +434,7 @@
           <div class="actions">
             <button class="btn btn-primary" onclick="orderScan('${v.patient_id}', '${v.visit_id}')">🔬 Request Scan/Test</button>
             <button class="btn btn-secondary" onclick="uploadReport('${v.patient_id}', '${v.visit_id}', '${user.doctor_id}')">📤 Upload Test Report</button>
-            <a class="btn btn-success" href="/dicom_viewer.html?visit_id=${v.visit_id}" target="_blank">🖼️ View DICOM Images</a>
+            <button class="btn btn-success" id="viewDicomBtn">🖼️ View DICOM Images</button>
             <button class="btn btn-danger" onclick="markVisitDone('${v.visit_id}')">✅ Mark as Complete</button>
           </div>
         </div>
@@ -455,6 +455,17 @@
         </div>
       `;
       document.getElementById('visitModalContent').innerHTML = content;
+      // Attach DICOM button handler
+      setTimeout(() => {
+        const viewBtn = document.getElementById('viewDicomBtn');
+        if (viewBtn && p.ohif_viewer_link) {
+          viewBtn.disabled = false;
+          viewBtn.onclick = () => window.open(p.ohif_viewer_link, '_blank');
+        } else if (viewBtn) {
+          viewBtn.disabled = true;
+          viewBtn.title = 'No DICOM link available';
+        }
+      }, 0);
       // Always scroll modal to top on visit switch
       document.getElementById('modalContentScroll').scrollTop = 0;
     }
@@ -492,6 +503,8 @@
     // Initial load
     fillDoctorInfo();
     loadQueue();
+    const ws = new WebSocket('ws://localhost:8083');
+    ws.onmessage = () => loadQueue();
   </script>
 </body>
 </html>

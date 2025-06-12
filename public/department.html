@@ -3,17 +3,126 @@
 <head>
   <title>Department Dashboard</title>
   <style>
-    body { font-family: Arial, sans-serif; background: #f8fafd; }
-    .container { max-width: 1100px; margin: 2em auto; background: #fff; border-radius: 8px; padding: 2em; }
-    h2 { color: #2c3e50; }
-    .worklist, .history { margin-bottom: 2em; }
-    table { width: 100%; border-collapse: collapse; margin-top: 1em; }
-    th, td { padding: 0.7em; border: 1px solid #ddd; text-align: left; }
-    th { background: #f8f9fa; }
-    .btn { padding: 0.7em 1.5em; background: #3498db; color: #fff; border: none; border-radius: 4px; cursor: pointer; }
-    .btn-done { background: #27ae60; }
+    body { font-family: Arial, sans-serif; background: linear-gradient(135deg, #f0f4f8 0%, #e3e8ef 100%); margin: 0; }
+    .container { max-width: 1200px; margin: 2rem auto; padding: 0 2rem; }
+    h2 { display: none; }
+    .header {
+      background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%); /* Applied color from doctor.html */
+      color: white;
+      padding: 1rem 2rem; /* Consistent padding */
+      display: flex;
+      justify-content: center; /* Center overall content */
+      align-items: center; /* Center vertically */
+      box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+    }
+    .header-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 2rem;
+      display: flex;
+      align-items: center;
+      width: 100%;
+    }
+    .hospital-name-left {
+      color: #2c3e50; /* Corrected to match doctor.html image */
+      font-size: 1.1rem; /* Consistent size */
+      font-weight: 700; 
+      white-space: nowrap;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      gap: 5px; 
+      line-height: 1;
+      margin: 0 auto 0 0; /* Push to the left */
+      padding: 0;
+    }
+    .hospital-name-left .icon {
+      font-size: 1.4rem; /* Consistent icon size */
+      line-height: 1;
+    }
+    .header-right {
+      text-align: right; font-size: 1rem; color: #f3f3f3; line-height: 1.5; display: flex; align-items: center; gap: 1.2rem;
+      flex-shrink: 0;
+      margin: 0 0 0 auto; /* Push to the right */
+    }
+    .header-title {
+      font-size: 1.8rem; /* Consistent with other dashboards */
+      font-weight: 700;
+      letter-spacing: 1px; /* Added for consistency with doctor.html */
+      color: white; /* Changed to white for visibility on blue header */
+      margin: 0 auto; /* Center the title */
+      flex: 0 1 auto; /* Allow it to shrink but not grow unnecessarily */
+      text-align: center;
+    }
+    .logout-btn {
+      background: #fff; /* Changed to white from red for consistency with doctor.html */
+      color: #4a90e2; /* Changed to primary blue from white for consistency with doctor.html */
+      border: none; 
+      border-radius: 6px; /* Changed to 6px from 8px for consistency */
+      padding: 0.5em 1em; /* Changed to 0.5em 1em from 0.6rem 1.2rem for consistency */
+      font-size: 1em; /* Changed to 1em from 0.9rem for consistency */
+      font-weight: 600;
+      cursor: pointer; 
+      transition: background 0.2s, color 0.2s; /* Changed transition for consistency */
+      box-shadow: 0 1px 4px rgba(74, 144, 226, 0.07); /* Updated box-shadow for consistency */
+      flex-shrink: 0;
+      margin: 0 0 0 auto; /* Push to the right */
+    }
+    .logout-btn:hover {
+      background-color: #4a90e2; /* Updated hover background for consistency */
+      color: #fff; /* Updated hover color for consistency */
+      transform: translateY(0px); /* Removed transform for consistency */
+    }
+    .worklist, .history { margin-bottom: 2rem; }
+    .card {
+      background: white;
+      border-radius: 12px;
+      padding: 2rem;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+      border: 1px solid rgba(0,0,0,0.05);
+    }
+    .card-header {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 1.5rem;
+    }
+    .card-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      color: white;
+    }
+    .pending-icon { background: linear-gradient(135deg, #667eea, #764ba2); }
+    .completed-icon { background: linear-gradient(135deg, #51cf66, #40c057); }
+    .card h3 {
+      font-size: 1.4rem;
+      font-weight: 600;
+      color: #2c3e50;
+      margin: 0;
+    }
+    table { width: 100%; border-collapse: collapse; margin-top: 1rem; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+    th, td { padding: 1rem; border-bottom: 1px solid #f1f3f4; text-align: left; }
+    th { background: linear-gradient(135deg, #f8f9fa, #e9ecef); font-weight: 600; color: #495057; border-bottom: 2px solid #dee2e6; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.5px; }
+    .queue-table tr:hover td { background: #f8f9fa; }
+    .queue-table tr:last-child td { border-bottom: none; }
+    .btn { padding: 0.7rem 1.5rem; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 0.9rem; transition: all 0.3s ease; text-decoration: none; display: inline-block; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+    .btn-primary { background: linear-gradient(135deg, #667eea, #764ba2); color: white; }
+    .btn-done { background: linear-gradient(135deg, #51cf66, #40c057); color: white; }
     .success { color: green; }
     .error { color: red; }
+
+    @media (max-width: 768px) {
+      .container { padding: 0 1rem; }
+      .header-content { padding: 0 1rem; }
+      .card { padding: 1.5rem; }
+      table th, table td { padding: 0.8rem 1rem; font-size: 0.85rem; }
+      .btn { padding: 0.6rem 1.2rem; font-size: 0.85rem; }
+    }
   </style>
 </head>
 <body>
@@ -28,15 +137,34 @@
     if (user.role !== 'department') window.location.href = '/login.html';
     const department_id = user.department_id;
   </script>
+  <div class="header">
+    <div class="header-content">
+      <div class="hospital-name-left">
+        <span class="icon">🏥</span> Sri Ramachandra Hospital
+      </div>
+      <span class="header-title">Department Dashboard</span>
+      <div class="header-right" id="departmentInfo">
+        <span id="departmentWelcome"></span>
+        <button class="logout-btn" onclick="logout()">Logout</button>
+      </div>
+    </div>
+  </div>
+
   <div class="container">
-    <h2>Department Dashboard</h2>
-    <div class="worklist">
-      <h3>Pending Worklist</h3>
+    
+    <div class="worklist card">
+      <div class="card-header">
+        <div class="card-icon pending-icon">📋</div>
+        <h3>Pending Worklist</h3>
+      </div>
       <div id="worklistTable"></div>
     </div>
-    <div class="history">
-      <h3>Completed Orders</h3>
-      <button class="btn" onclick="loadCompleted()">Refresh</button>
+    <div class="history card">
+      <div class="card-header">
+        <div class="card-icon completed-icon">✅</div>
+        <h3>Completed Orders</h3>
+      </div>
+      <button class="btn btn-primary" onclick="loadCompleted()">Refresh</button>
       <div id="historyTable"></div>
     </div>
   </div>
@@ -47,11 +175,11 @@
       const orders = await res.json();
       const div = document.getElementById('worklistTable');
       if (!orders.length) {
-        div.innerHTML = '<i>No pending orders.</i>';
+        div.innerHTML = '<i><div class="empty-state" style="padding: 2rem 1rem;"><div class="empty-state-icon">📭</div><p>No pending orders.</p></div></i>';
         return;
       }
       div.innerHTML = `
-        <table>
+        <table class="queue-table">
           <thead>
             <tr>
               <th>Patient</th><th>Reason</th><th>Modality</th><th>Doctor</th><th>Created</th><th>Action</th>
@@ -60,7 +188,7 @@
           <tbody>
             ${orders.map(o => `
               <tr>
-                <td>${o.first_name} ${o.last_name}</td>
+                <td><strong>${o.first_name} ${o.last_name}</strong></td>
                 <td>${o.reason || '-'}</td>
                 <td>${o.modality_name || '-'}</td>
                 <td>${o.doctor_name || '-'}</td>
@@ -92,11 +220,11 @@
       const orders = await res.json();
       const div = document.getElementById('historyTable');
       if (!orders.length) {
-        div.innerHTML = '<i>No completed orders.</i>';
+        div.innerHTML = '<i><div class="empty-state" style="padding: 2rem 1rem;"><div class="empty-state-icon">📊</div><p>No completed orders.</p></div></i>';
         return;
       }
       div.innerHTML = `
-        <table>
+        <table class="queue-table">
           <thead>
             <tr>
               <th>Patient</th><th>Reason</th><th>Modality</th><th>Doctor</th><th>Completed At</th>
@@ -105,7 +233,7 @@
           <tbody>
             ${orders.map(o => `
               <tr>
-                <td>${o.first_name} ${o.last_name}</td>
+                <td><strong>${o.first_name} ${o.last_name}</strong></td>
                 <td>${o.reason || '-'}</td>
                 <td>${o.modality_name || '-'}</td>
                 <td>${o.doctor_name || '-'}</td>
@@ -119,6 +247,15 @@
 
     loadWorklist();
     loadCompleted();
+
+    // --- Fill department info in header ---
+    function fillDepartmentInfo() {
+      let html = `Welcome, <b>${user.username || 'Department User'}</b>`;
+      // Add department name if available
+      if (user.department_name) html += `<br><span style="font-size:0.97em;">Department: ${user.department_name}</span>`;
+      document.getElementById('departmentWelcome').innerHTML = html;
+    }
+    fillDepartmentInfo(); // Call on load
   </script>
 </body>
 </html>

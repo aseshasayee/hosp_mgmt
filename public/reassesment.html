@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>ER Forms Test</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 2em; }
+    h2 { margin-top: 2em; }
+    .section { margin-bottom: 2em; border: 1px solid #ccc; padding: 1em; border-radius: 8px; }
+    label { display: block; margin-top: 0.7em; }
+    input, select, textarea { width: 100%; padding: 0.5em; margin-top: 0.2em; }
+    button { margin-top: 1em; }
+  </style>
+</head>
+<body>
+  <h1>ER Digital Forms Test</h1>
+
+  <div class="section">
+    <h2>Referral</h2>
+    <form id="referralForm">
+      <label>Patient ID <input name="patient_id" required></label>
+      <label>Visit ID <input name="visit_id" required></label>
+      <label>Specialty <input name="specialty"></label>
+      <label>Call Given To (Doctor Name) <input name="call_doctor_name"></label>
+      <label>Call Time <input name="call_time" type="datetime-local"></label>
+      <label>Seen By (Doctor Name) <input name="seen_by_doctor_name"></label>
+      <label>Seen Time <input name="seen_time" type="datetime-local"></label>
+      <button type="submit">Submit Referral</button>
+      <span id="referralMsg"></span>
+    </form>
+  </div>
+
+  <div class="section">
+    <h2>Investigations</h2>
+    <form id="investigationsForm">
+      <label>Patient ID <input name="patient_id" required></label>
+      <label>Visit ID <input name="visit_id" required></label>
+      <label><input type="checkbox" name="blood_urea"> Blood Urea</label>
+      <label><input type="checkbox" name="s_creatinine"> S. Creatinine</label>
+      <label><input type="checkbox" name="electrolytes"> Electrolytes</label>
+      <label><input type="checkbox" name="na"> Na+</label>
+      <label><input type="checkbox" name="k"> K+</label>
+      <label><input type="checkbox" name="troponin"> Troponin</label>
+      <label><input type="checkbox" name="bnp"> BNP</label>
+      <label>Others (Blood) <input name="others_blood"></label>
+      <label><input type="checkbox" name="xray"> X-ray</label>
+      <label>X-ray Findings <input name="xray_findings"></label>
+      <label><input type="checkbox" name="ct_scan"> CT Scan</label>
+      <label><input type="checkbox" name="mri"> MRI</label>
+      <label><input type="checkbox" name="ecg"> ECG</label>
+      <h4>ABG/VBG</h4>
+      <label>Time <input name="abg_time"></label>
+      <label>pH <input name="abg_ph"></label>
+      <label>PCO2 <input name="abg_pco2"></label>
+      <label>PO2 <input name="abg_po2"></label>
+      <label>HCO3 <input name="abg_hco3"></label>
+      <label>SpO2 <input name="abg_spo2"></label>
+      <label>Hb <input name="abg_hb"></label>
+      <label>Na+ <input name="abg_na"></label>
+      <label>K+ <input name="abg_k"></label>
+      <label>Lactate <input name="abg_lactate"></label>
+      <label>Glucose <input name="abg_glucose"></label>
+      <button type="submit">Submit Investigations</button>
+      <span id="investigationsMsg"></span>
+    </form>
+  </div>
+
+  <div class="section">
+    <h2>Reassessment</h2>
+    <form id="reassessForm">
+      <label>Patient ID <input name="patient_id" required></label>
+      <label>Visit ID <input name="visit_id" required></label>
+      <label>Date & Time <input name="reassessment_time" type="datetime-local"></label>
+      <label>Notes <textarea name="notes"></textarea></label>
+      <button type="submit">Submit Reassessment</button>
+      <span id="reassessMsg"></span>
+    </form>
+  </div>
+
+  <div class="section">
+    <h2>Discharge/Transfer</h2>
+    <form id="dischargeForm">
+      <label>Patient ID <input name="patient_id" required></label>
+      <label>Visit ID <input name="visit_id" required></label>
+      <label>Disposition
+        <select name="disposition">
+          <option>Discharged</option>
+          <option>Admitted</option>
+          <option>Against Medical Advice</option>
+          <option>Deceased</option>
+        </select>
+      </label>
+      <label>Admitted Dept <input name="admitted_dept"></label>
+      <label>Consultant <input name="consultant"></label>
+      <label>Ward/ICU <input name="ward_icu"></label>
+      <label>Pulse <input name="pulse"></label>
+      <label>BP <input name="bp"></label>
+      <label>RR <input name="rr"></label>
+      <label>SpO2 <input name="spo2"></label>
+      <label>Temp <input name="temp"></label>
+      <label>ER Physician Name <input name="er_physician_name"></label>
+      <label>Reg No. <input name="reg_no"></label>
+      <label>Signature <input name="signature"></label>
+      <label>Date & Time <input name="discharge_time" type="datetime-local"></label>
+      <button type="submit">Submit Discharge/Transfer</button>
+      <span id="dischargeMsg"></span>
+    </form>
+  </div>
+
+  <script>
+    // Helper to handle all forms
+    function handleForm(formId, url, msgId) {
+      document.getElementById(formId).onsubmit = async function(e) {
+        e.preventDefault();
+        const data = {};
+        for (const el of this.elements) {
+          if (!el.name) continue;
+          if (el.type === "checkbox") data[el.name] = el.checked;
+          else data[el.name] = el.value;
+        }
+        const res = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+        const msg = document.getElementById(msgId);
+        if (res.ok) {
+          msg.textContent = "Submitted!";
+          msg.className = "success";
+        } else {
+          msg.textContent = "Error submitting.";
+          msg.className = "error";
+        }
+      };
+    }
+    handleForm('referralForm', '/api/referrals', 'referralMsg');
+    handleForm('investigationsForm', '/api/investigations', 'investigationsMsg');
+    handleForm('reassessForm', '/api/reassessments', 'reassessMsg');
+    handleForm('dischargeForm', '/api/discharge-transfer', 'dischargeMsg');
+  </script>
+</body>
+</html>

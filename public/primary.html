@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Physician Primary Assessment</title>
+    <style>
+        body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    background-color: #f4f4f4;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+    padding: 20px; /* Add overall body padding */
+}
+
+.main-wrapper {
+    width: 100%;
+    max-width: 1000px;
+    background-color: #fff;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.15);
+    margin: 0;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.left-sidebar {
+    display: none; /* Hide the old sidebar */
+}
+
+.sidebar-text {
+    display: none; /* Hide the old sidebar text */
+}
+
+.container {
+    padding: 30px;
+    flex-grow: 1;
+    position: relative;
+}
+
+.header {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 25px;
+    border-bottom: 1px solid #ced4da;
+    padding-bottom: 15px;
+}
+
+.header h1 {
+    text-align: center;
+    margin-top: 0;
+    margin-bottom: 20px;
+    color: #343a40;
+    font-size: 1.8em;
+}
+
+.return-to-ed,
+.trauma-info {
+    display: flex;
+    align-items: center; /* Align items to center for consistency */
+    gap: 15px; /* Increase gap */
+    margin-bottom: 8px; /* Adjust margin */
+    flex-wrap: wrap;
+}
+
+.return-to-ed label,
+.trauma-info label {
+    white-space: nowrap;
+    font-weight: 600; /* Make labels a bit bolder */
+    color: #495057;
+}
+
+.date-field,
+.incident-place,
+.incident-datetime {
+    border: none;
+    border-bottom: 1px solid #6c757d; /* Slightly darker border for input lines */
+    padding: 4px; /* Increase padding */
+    flex-grow: 1;
+    min-width: 120px; /* Increase min-width for more space */
+    font-size: 0.95em;
+}
+
+.section {
+    border: 1px solid #ced4da;
+    margin-bottom: 25px; /* Increase margin */
+    display: flex;
+    border-radius: 5px; /* Add border-radius to sections */
+    overflow: hidden; /* Ensures content stays within rounded corners */
+}
+
+.section-title {
+    background-color: #f8f9fa;
+    padding: 12px 10px; /* Adjust padding */
+    font-weight: bold;
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+    transform: rotate(180deg);
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-right: 1px solid #ced4da;
+    width: 30px; /* Slightly increase width for vertical titles */
+    text-align: center;
+    color: #343a40;
+    font-size: 0.9em;
+}
+
+.section-content {
+    padding: 20px;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 15px; /* Space between groups */
+}
+
+.checkbox-group,
+.line-item {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-bottom: 0;
+    gap: 4px; /* Further reduced gap for closer spacing */
+}
+
+.checkbox-group label,
+.line-item label {
+    white-space: nowrap;
+    color: #343a40;
+}
+
+input[type="checkbox"] {
+    margin-right: 2px;
+    transform: scale(1.1);
+}
+
+.input-line {
+    border: none;
+    border-bottom: 1px solid #6c757d;
+    flex-grow: 1;
+    min-width: 150px;
+    padding: 4px;
+    font-size: 0.95em;
+}
+
+.short-input {
+    width: 60px;
+    border: none;
+    border-bottom: 1px solid #6c757d;
+    padding: 4px;
+    font-size: 0.95em;
+}
+
+.short-input-air-entry {
+    width: 80px; /* Adjust width as needed */
+    border: none;
+    border-bottom: 1px solid #6c757d;
+    padding: 4px;
+    font-size: 0.95em;
+}
+
+.disability-short-input {
+    width: 90px; /* Increased width to accommodate 3 inputs on one line */
+    border: none;
+    border-bottom: 1px solid #6c757d;
+    padding: 4px;
+    font-size: 0.95em;
+}
+
+.intervention {
+    display: flex;
+    align-items: center;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    gap: 10px;
+}
+
+.intervention label {
+    font-weight: 600;
+    color: #495057;
+}
+
+.right-aligned {
+    margin-left: auto;
+    padding-right: 15px;
+}
+
+.cervical-respiratory-spacing {
+    width: 100%; /* Ensure it takes full width */
+}
+
+.circulation-row {
+    display: flex;
+    justify-content: space-between; /* Distribute items across the row */
+    width: 100%;
+    margin-bottom: 10px; /* Space between rows */
+    align-items: flex-start; /* Align items to the top of the row */
+    flex-wrap: wrap; /* Allow wrapping on smaller screens */
+}
+
+.circulation-column {
+    display: flex;
+    flex-direction: column;
+    gap: 8px; /* Space between items in a column */
+}
+
+.right-align-group {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.circulation-heart-group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.circulation-skin-bleeding-row {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.circulation-first-row {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-bottom: 10px;
+}
+
+.pr-bp-capillary-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.distended-neck-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.active-bleeding-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-left: auto; /* Ensure it's pushed to the right */
+}
+
+.circulation-flex-row {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    margin-bottom: 8px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.circulation-flex-item {
+    display: flex;
+    align-items: center;
+    gap: 8px; /* Consistent gap for items */
+}
+
+.flex-break {
+    flex-basis: 100%;
+    height: 0;
+}
+
+.qsofa-score {
+    /* Removed specific styling for qsofa-score as it's now part of a line-item */
+}
+
+.disability-bottom-row {
+    /* This class is no longer needed as per the new HTML structure */
+}
+
+.cbg-group,
+.plantar-reflex-group {
+    /* These classes are no longer needed as per the new HTML structure */
+}
+
+.double-section {
+    display: flex;
+    flex-direction: row;
+    border: 1px solid #ced4da;
+    margin-bottom: 25px;
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+.disability-exposure-wrapper {
+    display: flex;
+    flex-grow: 1;
+    width: 100%; /* Ensure wrapper takes full width */
+}
+
+.section-half {
+    display: flex;
+    flex-direction: column;
+    /* Removed border: 1px solid #ced4da; */ /* Remove individual borders */
+    margin-bottom: 0px;
+    flex-grow: 1;
+    border-radius: 0; /* Remove border-radius here */
+    overflow: hidden;
+}
+
+.section-half:first-child {
+    border-right: 1px solid #ced4da; /* Add right border for the divider */
+}
+
+.double-section .section-title {
+    width: auto;
+    text-orientation: upright;
+    transform: none;
+    writing-mode: horizontal-tb;
+    border-bottom: 1px solid #ced4da;
+    border-right: none;
+    padding: 8px 15px;
+    font-size: 1em;
+    background-color: #f8f9fa; /* Ensure title background color */
+    color: #343a40;
+    font-weight: bold;
+    text-align: center; /* Center align the title */
+}
+
+.double-section .section-content {
+    border-left: none;
+    border-top: none;
+    padding: 15px;
+    gap: 10px;
+    flex-grow: 1; /* Allow content to grow */
+}
+
+.page-number {
+    position: absolute;
+    bottom: 15px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 1em;
+    color: #888;
+}
+
+.extra-short-input {
+    width: 80px;
+    border: none;
+    border-bottom: 1px solid #6c757d;
+    padding: 4px;
+    font-size: 0.95em;
+}
+
+.heart-skin-group {
+    display: flex;
+    align-items: flex-start; /* Align items to the top for better multi-line control */
+    justify-content: space-between; /* To push active-bleeding-group to right */
+    width: 100%;
+    flex-wrap: wrap;
+    margin-bottom: 10px;
+}
+
+.heart-sounds-skin-wrapper {
+    display: flex;
+    flex-direction: row; /* Keep items on the same line */
+    gap: 20px; /* Space between Heart Sounds and Skin */
+    align-items: center; /* Align items vertically */
+    flex-wrap: wrap;
+}
+
+.intervention-columns-wrapper {
+    display: flex;
+    flex-direction: row;
+    gap: 20px; /* Space between left and right intervention columns */
+    flex-wrap: wrap;
+}
+
+.left-column-interventions,
+.right-column-interventions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.pelvic-chest-compressions-group {
+    display: flex;
+    flex-direction: column; /* Stack items vertically */
+    margin-left: auto; /* Push this container to the right */
+    align-items: flex-start; /* Align content within to the left, as per image */
+    gap: 8px;
+    margin-top: 0;
+    margin-right: 0;
+    width: auto;
+}
+
+.right-aligned {
+    margin-left: auto;
+    padding-right: 0;
+}
+
+.circulation-combined-section {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+}
+
+.circulation-main-content-row {
+    display: flex;
+    justify-content: space-between; /* Distribute intervention group and compressions */
+    width: 100%;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+    align-items: flex-start; /* Align items to the top */
+}
+
+.circulation-bottom-row {
+    display: flex;
+    justify-content: space-between; /* Distribute intervention group and compressions */
+    width: 100%;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+    align-items: flex-start; /* Align items to the top */
+}
+
+.intervention-list-group {
+    display: flex;
+    /* Removed width: 100%; */ /* Allow it to share space with compressions */
+    justify-content: flex-start; /* Align intervention columns to the left */
+    gap: 20px; /* Space between left and right intervention columns */
+    flex-wrap: wrap;
+}
+    </style>
+</head>
+<body>
+    <div class="main-wrapper">
+        <div class="container">
+            <div class="header">
+                <h1>Physician Primary Assessment</h1>
+                <div class="return-to-ed">
+                    <label>RETURN TO ED WITHIN 72 HOURS WITH SIMILAR COMPLAINTS:</label>
+                    <input type="checkbox" id="yes_complaints">
+                    <label for="yes_complaints">YES</label>
+                    <input type="checkbox" id="no_complaints">
+                    <label for="no_complaints">NO</label>
+                    <label>DATE:</label>
+                    <input type="date" class="date-field">
+                </div>
+                <div class="trauma-info">
+                    <label>If Trauma,</label>
+                    <label>Place of Incident</label>
+                    <input type="text" class="incident-place">
+                    <label>Date & Time:</label>
+                    <input type="text" class="incident-datetime">
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-title">AIRWAY</div>
+                <div class="section-content">
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="patent">
+                        <label for="patent">Patent</label>
+                        <input type="checkbox" id="threatened">
+                        <label for="threatened">Threatened</label>
+                        <input type="text" class="input-line">
+                        <input type="checkbox" id="compromised">
+                        <label for="compromised">Compromised</label>
+                        <input type="text" class="input-line">
+                    </div>
+                    <div class="line-item cervical-respiratory-spacing">
+                        <label for="cervical_spine">Cervical Spine:</label>
+                        <input type="text" class="input-line">
+                    </div>
+                    <div class="checkbox-group cervical-respiratory-spacing">
+                        <input type="checkbox" id="cervical_collar">
+                        <label for="cervical_collar">Cervical Collar</label>
+                        <input type="checkbox" id="gurgling">
+                        <label for="gurgling">Gurgling</label>
+                        <input type="checkbox" id="stridor">
+                        <label for="stridor">Stridor</label>
+                        <input type="checkbox" id="wheeze">
+                        <label for="wheeze">Wheeze</label>
+                    </div>
+                    <div class="intervention">
+                        <label>Intervention:</label>
+                    </div>
+                    <div class="checkbox-group cervical-respiratory-spacing">
+                        <input type="checkbox" id="airway_opening">
+                        <label for="airway_opening">Airway Opening</label>
+                        <input type="checkbox" id="suction">
+                        <label for="suction">Suction</label>
+                        <input type="checkbox" id="oropharyngeal_airway">
+                        <label for="oropharyngeal_airway">Oropharyngeal Airway / Nasopharyngeal Airway</label>
+                    </div>
+                    <div class="checkbox-group cervical-respiratory-spacing">
+                        <input type="checkbox" id="endotracheal_intubation">
+                        <label for="endotracheal_intubation">Endotracheal Intubation</label>
+                        <input type="checkbox" id="tube_size_checkbox">
+                        <label for="tube_size">Tube Size:</label>
+                        <input type="text" class="short-input">
+                        <input type="checkbox" id="surgical_airway">
+                        <label for="surgical_airway">Surgical Airway</label>
+                        <input type="text" class="input-line">
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-title">BREATHING</div>
+                <div class="section-content">
+                    <div class="line-item" style="justify-content: flex-start;">
+                        <label>RR:</label>
+                        <input type="text" class="short-input">
+                        <label>SpO2:</label>
+                        <input type="text" class="short-input">
+                        <label>Air Entry:</label>
+                        <input type="text" class="short-input-air-entry">
+                        <label>Subcutaneous Emphysema</label>
+                        <input type="checkbox" id="emphysema_yes">
+                        <label for="emphysema_yes">Yes</label>
+                        <input type="checkbox" id="emphysema_no">
+                        <label for="emphysema_no">No</label>
+                    </div>
+                    <div class="line-item">
+                        <label>Trachea Position</label>
+                        <input type="checkbox" id="midline">
+                        <label for="midline">Midline</label>
+                        <input type="checkbox" id="shifted_left">
+                        <label for="shifted_left">Shifted to Left</label>
+                        <input type="checkbox" id="shifted_right">
+                        <label for="shifted_right">Shifted to Right</label>
+                    </div>
+                    <div class="intervention">
+                        <label>Intervention:</label>
+                    </div>
+                    <div class="checkbox-group cervical-respiratory-spacing">
+                        <input type="checkbox" id="face_mask">
+                        <label for="face_mask">Face Mask / Nasal Cannula / Non Rebreathing</label>
+                        <input type="checkbox" id="nebulization">
+                        <label for="nebulization">Nebulization</label>
+                        <input type="checkbox" id="non_invasive_ventilation">
+                        <label for="non_invasive_ventilation">Non Invasive Ventilation</label>
+                    </div>
+                    <div class="checkbox-group cervical-respiratory-spacing">
+                        <input type="checkbox" id="invasive_ventilation">
+                        <label for="invasive_ventilation">Invasive Ventilation</label>
+                        <input type="checkbox" id="needle_decompression">
+                        <label for="needle_decompression">Needle Decompression</label>
+                        <input type="checkbox" id="icd">
+                        <label for="icd">ICD</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-title">CIRCULATION</div>
+                <div class="section-content">
+                    <div class="line-item circulation-first-row">
+                        <div class="pr-bp-capillary-group">
+                            <label>PR:</label>
+                            <input type="text" class="short-input">
+                            <label>BP:</label>
+                            <input type="text" class="short-input">
+                            <label>Capillary Refill</label>
+                            <input type="text" class="short-input">
+                            <label>secs</label>
+                        </div>
+                        <div class="distended-neck-group right-align-group">
+                            <label>Distended Neck Veins:</label>
+                            <input type="checkbox" id="d_neck_veins_yes">
+                            <label for="d_neck_veins_yes">Yes</label>
+                            <input type="checkbox" id="d_neck_veins_no">
+                            <label for="d_neck_veins_no">No</label>
+                        </div>
+                    </div>
+                    <div class="heart-skin-group">
+                        <div class="heart-sounds-skin-wrapper">
+                            <div class="line-item">
+                                <label>Heart Sounds:</label>
+                                <input type="text" class="extra-short-input">
+                            </div>
+                            <div class="line-item">
+                                <input type="checkbox" id="skin">
+                                <label for="skin">Skin:</label>
+                                <input type="text" class="input-line">
+                            </div>
+                        </div>
+                        <div class="active-bleeding-group">
+                            <label>Active Bleeding:</label>
+                            <input type="checkbox" id="bleeding_yes">
+                            <label for="bleeding_yes">Yes</label>
+                            <input type="checkbox" id="bleeding_no">
+                            <label for="bleeding_no">No</label>
+                        </div>
+                    </div>
+                    <div class="intervention">
+                        <label>Intervention:</label>
+                    </div>
+                    <div class="circulation-main-content-row">
+                        <div class="intervention-columns-wrapper">
+                            <div class="left-column-interventions">
+                                <div class="circulation-flex-item">
+                                    <input type="checkbox" id="iv_line">
+                                    <label for="iv_line">IV Line</label>
+                                </div>
+                                <div class="circulation-flex-item">
+                                    <input type="checkbox" id="central_line">
+                                    <label for="central_line">Central Line</label>
+                                </div>
+                                <div class="circulation-flex-item">
+                                    <input type="checkbox" id="iv_fluid">
+                                    <label for="iv_fluid">IV Fluid</label>
+                                </div>
+                            </div>
+                            <div class="right-column-interventions">
+                                <div class="circulation-flex-item">
+                                    <input type="checkbox" id="blood_transfusion">
+                                    <label for="blood_transfusion">Blood Transfusion</label>
+                                </div>
+                                <div class="circulation-flex-item">
+                                    <input type="checkbox" id="vasopressors">
+                                    <label for="vasopressors">Vasopressors</label>
+                                </div>
+                                <div class="circulation-flex-item">
+                                    <input type="checkbox" id="splinting">
+                                    <label for="splinting">Splinting / Compressions / Suture / Ligation</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="pelvic-chest-compressions-group right-align-group">
+                            <div class="line-item">
+                                <label>Pelvic Compression:</label>
+                                <input type="checkbox" id="pelvic_comp_positive">
+                                <label for="pelvic_comp_positive">Positive</label>
+                                <input type="checkbox" id="pelvic_comp_negative">
+                                <label for="pelvic_comp_negative">Negative</label>
+                            </div>
+                            <div class="line-item">
+                                <label>Chest Compressions</label>
+                                <input type="checkbox" id="chest_comp_positive">
+                                <label for="chest_comp_positive">Positive</label>
+                                <input type="checkbox" id="chest_comp_negative">
+                                <label for="chest_comp_negative">Negative</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section double-section">
+                <div class="disability-exposure-wrapper">
+                    <div class="section-half">
+                        <div class="section-title">DISABILITY</div>
+                        <div class="section-content">
+                            <div class="line-item">
+                                <label>GCS:</label>
+                                <input type="text" class="short-input">
+                                <label>Pupils:</label>
+                                <input type="text" class="short-input">
+                                <label>FND</label>
+                                <input type="text" class="input-line">
+                            </div>
+                            <div class="line-item cbg-qsofa-plantar-line">
+                                <label>CBG:</label>
+                                <input type="text" class="disability-short-input">
+                                <label>qSOFA score :</label>
+                                <input type="text" class="disability-short-input">
+                                <label>Plantar/Reflex:</label>
+                                <input type="text" class="disability-short-input">
+                            </div>
+                            <div class="intervention">
+                                <label>Intervention:</label>
+                                <input type="text" class="input-line">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="section-half">
+                        <div class="section-title">EXPOSURE</div>
+                        <div class="section-content">
+                            <div class="line-item">
+                                <label>Temp :</label>
+                                <input type="text" class="short-input">
+                            </div>
+                            <div class="line-item">
+                                <label>Log Roll:</label>
+                                <input type="text" class="input-line">
+                            </div>
+                            <div class="intervention">
+                                <label>Intervention:</label>
+                                <input type="text" class="input-line">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-title">ADJUNCTS</div>
+                <div class="section-content">
+                    <div class="checkbox-group cervical-respiratory-spacing">
+                        <input type="checkbox" id="ecg">
+                        <label for="ecg">ECG</label>
+                        <input type="checkbox" id="chest_xray">
+                        <label for="chest_xray">Chest X-ray</label>
+                        <input type="checkbox" id="fast">
+                        <label for="fast">FAST</label>
+                        <input type="checkbox" id="two_d_echo">
+                        <label for="two_d_echo">2D ECHO</label>
+                    </div>
+                    <div class="checkbox-group cervical-respiratory-spacing">
+                        <input type="checkbox" id="blood_gas_analysis">
+                        <label for="blood_gas_analysis">Blood Gas Analysis</label>
+                        <input type="checkbox" id="pelvic_xray">
+                        <label for="pelvic_xray">Pelvic X-ray</label>
+                        <input type="checkbox" id="ng_tube">
+                        <label for="ng_tube">NG Tube:</label>
+                        <input type="text" class="short-input">
+                        <input type="checkbox" id="foley_catheter">
+                        <label for="foley_catheter">Foley Catheter</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html> 

@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Medical History Assessment Form</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 900px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #f0f0f0;
+        }
+        
+        .form-container {
+            background-color: white;
+            border: 2px solid #8b7db8;
+            display: flex;
+            min-height: 600px;
+            position: relative;
+        }
+        
+        .sidebar {
+            background-color: #8b7db8;
+            width: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        
+        .sidebar-text {
+            color: white;
+            font-weight: bold;
+            font-size: 14px;
+            writing-mode: vertical-rl;
+            text-orientation: mixed;
+            letter-spacing: 2px;
+        }
+        
+        .form-content {
+            flex: 1;
+            padding: 20px 30px;
+        }
+        
+        .section {
+            margin-bottom: 25px;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 15px;
+        }
+        
+        .section:last-child {
+            border-bottom: none;
+        }
+        
+        .section-title {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+        
+        .text-area {
+            width: 100%;
+            min-height: 80px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            resize: vertical;
+            font-family: inherit;
+            padding: 10px;
+            font-size: 14px;
+            background-color: #fafafa;
+        }
+        
+        .text-area::placeholder {
+            color: #999;
+            font-style: italic;
+        }
+        
+        .large-text-area {
+            min-height: 120px;
+        }
+        
+        .checkbox-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin: 15px 0;
+        }
+        
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+        }
+        
+        .checkbox-item input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            accent-color: #8b7db8;
+        }
+        
+        .others-section {
+            margin-top: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .others-section label {
+            font-weight: bold;
+            font-size: 14px;
+            min-width: 60px;
+        }
+        
+        .others-section input[type="text"] {
+            border: none;
+            border-bottom: 1px solid #ccc;
+            padding: 5px 0;
+            width: 300px;
+            font-size: 14px;
+        }
+        
+        .additional-history {
+            margin-top: 20px;
+            display: flex;
+            align-items: center;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .history-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .history-item label {
+            font-weight: bold;
+            font-size: 14px;
+            color: #333;
+            white-space: nowrap;
+        }
+        
+        .history-item input[type="text"] {
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            padding: 8px 12px;
+            font-size: 14px;
+            width: 150px;
+            background-color: #fafafa;
+        }
+        
+        .history-item input[type="text"]:focus {
+            outline: none;
+            border-color: #8b7db8;
+            background-color: white;
+        }
+        
+        .datetime-input {
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            padding: 8px 12px;
+            font-size: 14px;
+            width: 200px;
+            background-color: #fafafa;
+        }
+        
+        .datetime-input:focus {
+            outline: none;
+            border-color: #8b7db8;
+            background-color: white;
+        }
+        
+        .gyneco-section {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            align-items: center;
+        }
+        
+        .gyneco-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .gyneco-item input[type="text"] {
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            padding: 5px 8px;
+            font-size: 14px;
+            background-color: #fafafa;
+        }
+        
+        .gyneco-item input[type="text"]:focus {
+            outline: none;
+            border-color: #8b7db8;
+            background-color: white;
+        }
+        
+        .page-number {
+            text-align: center;
+            margin-top: 20px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <div class="sidebar">
+            <div class="sidebar-text">PHYSICIAN SECONDARY ASSESSMENT</div>
+        </div>
+        <div class="form-content">
+            <div class="section">
+                <div class="section-title">1. Symptoms and Signs</div>
+                <textarea class="text-area large-text-area" placeholder="Enter symptoms and signs..."></textarea>
+            </div>
+            
+            <div class="section">
+                <div class="section-title">2. Allergy History:</div>
+                <textarea class="text-area" placeholder="Enter allergy history..."></textarea>
+            </div>
+            
+            <div class="section">
+                <div class="section-title">3. Medication History:</div>
+                <textarea class="text-area" placeholder="Enter medication history..."></textarea>
+            </div>
+            
+            <div class="section">
+                <div class="section-title">4. Past Medical / Surgical History:</div>
+                <div class="checkbox-row">
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="dm">
+                        <label for="dm">DM</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="htn">
+                        <label for="htn">HTN</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="cad">
+                        <label for="cad">CAD</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="ckd">
+                        <label for="ckd">CKD</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="copd">
+                        <label for="copd">COPD</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="cld">
+                        <label for="cld">CLD</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="ptb">
+                        <label for="ptb">PTB</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="cva">
+                        <label for="cva">CVA</label>
+                    </div>
+                </div>
+                
+                <div class="others-section">
+                    <label for="others">Others:</label>
+                    <input type="text" id="others" placeholder="Specify other conditions...">
+                </div>
+                
+                <div class="additional-history">
+                    <div class="history-item">
+                        <label for="smoking">Smoking:</label>
+                        <input type="text" id="smoking" placeholder="Pack years/status">
+                    </div>
+                    <div class="history-item">
+                        <label for="alcohol">Alcohol:</label>
+                        <input type="text" id="alcohol" placeholder="Units/frequency">
+                    </div>
+                    <div class="history-item">
+                        <label for="malignancies">Malignancies:</label>
+                        <input type="text" id="malignancies" placeholder="Type/history">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="section">
+                <div class="section-title">5. Last Meal Time:</div>
+                <input type="datetime-local" class="datetime-input">
+            </div>
+            
+            <div class="section">
+                <div class="section-title">6. Family History:</div>
+                <textarea class="text-area large-text-area" placeholder="Enter family history..."></textarea>
+            </div>
+            
+            <div class="section">
+                <div class="section-title">7. Gynecological History:</div>
+                <div class="gyneco-section">
+                    <div class="gyneco-item">
+                        <label><strong>G:</strong></label>
+                        <input type="text" style="width: 40px;">
+                    </div>
+                    <div class="gyneco-item">
+                        <label><strong>P:</strong></label>
+                        <input type="text" style="width: 40px;">
+                    </div>
+                    <div class="gyneco-item">
+                        <label><strong>L:</strong></label>
+                        <input type="text" style="width: 40px;">
+                    </div>
+                    <div class="gyneco-item">
+                        <label><strong>A:</strong></label>
+                        <input type="text" style="width: 40px;">
+                    </div>
+                    <div class="gyneco-item">
+                        <label><strong>LMP:</strong></label>
+                        <input type="text" style="width: 80px;">
+                    </div>
+                    <div class="gyneco-item">
+                        <label><strong>Menarche:</strong></label>
+                        <input type="text" style="width: 60px;">
+                    </div>
+                    <div class="gyneco-item">
+                        <label><strong>Menopause:</strong></label>
+                        <input type="text" style="width: 60px;">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="page-number">3</div>
+        </div>
+    </div>
+</body>
+</html>

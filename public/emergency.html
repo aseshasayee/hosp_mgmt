@@ -1,0 +1,927 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Emergency Registration & Triage</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body { font-family: Arial, sans-serif; background: #f5f5f5; margin: 0; padding: 20px; }
+    .main-container { max-width: 1000px; margin: 0 auto; }
+    .tab { display: inline-block; padding: 0.7em 2em; background: #eee; margin-right: 0.5em; cursor: pointer; border-radius: 5px 5px 0 0; }
+    .tab.active { background: #fff; border-bottom: 2px solid #fff; }
+    .tab-content { background: #fff; padding: 2em; border-radius: 0 5px 5px 5px; border: 1px solid #ddd; margin-top: -2px; }
+    
+    * { box-sizing: border-box; }
+    .form-container { max-width: 800px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);}
+    .header { text-align: center; margin-bottom: 20px; border-bottom: 2px solid #333; padding-bottom: 15px; }
+    .hospital-name { font-size: 18px; font-weight: bold; color: #333; }
+    .hospital-address { font-size: 12px; color: #666; margin-bottom: 10px; }
+    .form-title { background: #e6e6fa; padding: 8px; font-weight: bold; font-size: 16px; text-align: center; margin: 10px 0;}
+    
+    .form-row, .row { display: flex; margin-bottom: 15px; gap: 20px; flex-wrap: wrap;}
+    .form-group { display: flex; align-items: center; gap: 10px; flex: 1;}
+    .form-group label { font-weight: bold; min-width: 140px; text-align: left;}
+    .form-group input[type="text"], 
+    .form-group input[type="number"], 
+    .form-group input[type="tel"], 
+    .form-group input[type="date"], 
+    .form-group input[type="datetime-local"], 
+    .form-group select { 
+      border: none; 
+      border-bottom: 1px solid #333; 
+      padding: 5px 0; 
+      background: transparent; 
+      min-width: 180px; 
+      flex: 1;
+    }
+    
+    .checkbox-group { display: flex; gap: 20px; flex-wrap: wrap; align-items: center;}
+    .checkbox-item { display: flex; align-items: center; gap: 8px; white-space: nowrap;}
+    .vitals-section { background: #f9f9f9; padding: 15px; margin: 15px 0; border-radius: 5px;}
+    .vitals-section h3 { margin-bottom: 15px; color: #333;}
+    .vitals-section .form-group { min-width: 200px;}
+    .vitals-section .form-group label { min-width: 100px;}
+    .vitals-section .form-group input { min-width: 80px;}
+    .vitals-section .form-group span { font-size: 12px; color: #666; margin-left: 5px;}
+    
+    .pain-scale { display: flex; gap: 15px; margin: 15px 0; align-items: center; padding: 10px; background: #f9f9f9; border-radius: 5px;}
+    .pain-scale label { font-weight: bold; min-width: 100px;}
+    .pain-scale-numbers { display: flex; gap: 20px; font-size: 12px; color: #666;}
+    .pain-scale .form-group { gap: 10px;}
+    .pain-scale input[type="range"] { min-width: 200px;}
+    
+    .triage-section { margin: 20px 0;}
+    .triage-buttons { display: flex; gap: 10px; margin: 10px 0;}
+    .triage-btn { padding: 10px 20px; border: 2px solid #333; border-radius: 5px; font-weight: bold; cursor: pointer; transition: all 0.3s; opacity: 0.5;}
+    .triage-btn.red { background: #ff4444; color: white;}
+    .triage-btn.yellow { background: #ffdd44; color: black;}
+    .triage-btn.green { background: #44ff44; color: black;}
+    .triage-btn:hover { opacity: 0.8;}
+    .triage-btn.selected { opacity: 1; transform: scale(1.05); }
+    
+    .signature-section { display: flex; justify-content: space-between; margin-top: 30px; padding-top: 20px; border-top: 1px solid #ddd;}
+    .signature-box { text-align: center; min-width: 200px;}
+    .signature-line { border-bottom: 1px solid #333; height: 40px; margin-bottom: 5px;}
+    
+    textarea { width: 100%; min-height: 80px; border: 1px solid #ddd; padding: 10px; border-radius: 4px; resize: vertical;}
+    .neuro-response { display: flex; gap: 25px; margin: 10px 0; flex-wrap: wrap;}
+    .neuro-item { display: flex; align-items: center; gap: 8px; white-space: nowrap;}
+    .radio-group { display: flex; gap: 20px; align-items: center; flex-wrap: wrap;}
+    .radio-item { display: flex; align-items: center; gap: 8px; white-space: nowrap;}
+    .full-width { width: 100%;}
+    .full-width .form-group { width: 100%;}
+    .full-width label { min-width: 140px;}
+    .footer-text { text-align: center; margin-top: 20px; font-size: 12px; color: #666;}
+    
+    button[type="submit"] { 
+      background: #007bff; 
+      color: white; 
+      padding: 12px 24px; 
+      border: none; 
+      border-radius: 5px; 
+      cursor: pointer; 
+      font-size: 16px; 
+      margin-top: 20px;
+    }
+    button[type="submit"]:hover { background: #0056b3; }
+    
+    .success { color: green; font-weight: bold; margin-left: 10px; }
+    .error { color: red; font-weight: bold; margin-left: 10px; }
+    
+    .patient-info-display { 
+      background: #e9ecef; 
+      padding: 15px; 
+      border-radius: 5px; 
+      margin-bottom: 20px; 
+      display: none;
+    }
+    .patient-info-display.show { display: block; }
+    .patient-info-display h4 { margin: 0 0 10px 0; color: #333; }
+    
+    @media (max-width: 768px) {
+      .form-row, .row { flex-direction: column; gap: 15px;}
+      .form-group { flex-direction: column; align-items: flex-start; gap: 8px;}
+      .form-group label { min-width: auto; width: 100%;}
+      .form-group input, .form-group select { width: 100%; min-width: auto;}
+      .signature-section { flex-direction: column; gap: 20px;}
+      .triage-buttons { flex-direction: column; align-items: center;}
+      .checkbox-group { flex-direction: column; gap: 10px;}
+      .neuro-response { flex-direction: column; gap: 10px;}
+      .main-container { padding: 10px; }
+      body { padding: 10px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="main-container">
+    <h2>Emergency Registration & Triage</h2>
+    <div>
+      <div class="tab active" id="tab1" onclick="showTab(1)">Patient Registration</div>
+      <div class="tab" id="tab2" onclick="showTab(2)">Triage Information</div>
+    </div>
+    
+    <!-- Patient Registration Tab -->
+    <div id="tabContent1" class="tab-content">
+      <div class="form-container">
+        <div class="form-title">PATIENT REGISTRATION</div>
+        <form id="patientForm">
+          <div class="row">
+            <div class="form-group">
+              <label>First Name *</label>
+              <input name="first_name" required>
+            </div>
+            <div class="form-group">
+              <label>Last Name *</label>
+              <input name="last_name" required>
+            </div>
+          </div>
+          <div class="row">
+            <div class="form-group">
+              <label>Date of Birth *</label>
+              <input type="date" name="dob" required>
+            </div>
+            <div class="form-group">
+              <label>Sex *</label>
+              <select name="sex" required>
+                <option value="">Select</option>
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+          </div>
+          <div class="row">
+            <div class="form-group">
+              <label>Phone Number</label>
+              <input type="tel" name="phone">
+            </div>
+            <div class="form-group">
+              <label>Emergency Contact</label>
+              <input type="tel" name="emergency_contact">
+            </div>
+          </div>
+          <div class="form-group full-width">
+            <label>Address</label>
+            <input name="address">
+          </div>
+          <div class="form-group full-width">
+            <label>Known Allergies</label>
+            <input name="allergies" placeholder="List any known allergies or write 'None'">
+          </div>
+          <button type="submit">Register Patient</button>
+          <span id="patientMsg"></span>
+        </form>
+      </div>
+    </div>
+    
+    <!-- Triage Tab -->
+    <div id="tabContent2" class="tab-content" style="display:none;">
+      <div class="form-container">
+        <!-- Patient Selection -->
+        <div class="form-row">
+          <div class="form-group">
+            <label>Select Patient *</label>
+            <select id="patientSelect" name="patient_id" required>
+              <option value="">Select Registered Patient</option>
+            </select>
+          </div>
+        </div>
+        
+        <!-- Patient Info Display -->
+        <div id="patientInfoDisplay" class="patient-info-display">
+          <h4>Patient Information</h4>
+          <div id="selectedPatientInfo"></div>
+        </div>
+        
+        <form id="triageForm">
+          <input type="hidden" name="patient_id" id="selectedPatientId">
+          
+          <!-- Header Section -->
+          <div class="header">
+            <div class="hospital-name">SRI RAMACHANDRA MEDICAL CENTRE</div>
+            <div class="hospital-address">Porur, Chennai - 600 116.</div>
+          </div>
+          
+          <div class="form-title">EMERGENCY MEDICINE CASE RECORD</div>
+          
+          <!-- Basic Information -->
+          <div class="form-row">
+            <div class="form-group">
+              <label>Bed No.:</label>
+              <input type="text" name="bed_no">
+            </div>
+            <div class="form-group">
+              <label>OP/HID No.:</label>
+              <input type="text" name="op_hid_no">
+            </div>
+          </div>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label>Area:</label>
+              <input type="text" name="area">
+            </div>
+            <div class="form-group">
+              <label>Date/Time:</label>
+              <input type="datetime-local" name="date_time" id="dateTimeInput">
+            </div>
+          </div>
+          
+          <!-- Arrival Information -->
+          <div class="form-row">
+            <div class="form-group full-width">
+              <label>Mode of Arrival:</label>
+              <div class="checkbox-group">
+                <div class="checkbox-item">
+                  <input type="radio" id="stretcher" name="mode_arrival" value="stretcher">
+                  <label for="stretcher">Stretcher</label>
+                </div>
+                <div class="checkbox-item">
+                  <input type="radio" id="wheelchair" name="mode_arrival" value="wheelchair">
+                  <label for="wheelchair">Wheel Chair</label>
+                </div>
+                <div class="checkbox-item">
+                  <input type="radio" id="walkin" name="mode_arrival" value="walkin">
+                  <label for="walkin">Walk In</label>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="form-row">
+            <div class="form-group full-width">
+              <label>Referral:</label>
+              <div class="checkbox-group">
+                <div class="checkbox-item">
+                  <input type="radio" id="self" name="referral" value="self">
+                  <label for="self">Self</label>
+                </div>
+                <div class="checkbox-item">
+                  <input type="radio" id="opd" name="referral" value="opd">
+                  <label for="opd">OPD</label>
+                </div>
+                <div class="checkbox-item">
+                  <input type="radio" id="other_ref" name="referral" value="other">
+                  <label for="other_ref">Other</label>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="form-row">
+            <div class="form-group full-width">
+              <label>Mode of Transport:</label>
+              <div class="checkbox-group">
+                <div class="checkbox-item">
+                  <input type="radio" id="ambulance" name="mode_transport" value="ambulance">
+                  <label for="ambulance">Ambulance</label>
+                </div>
+                <div class="checkbox-item">
+                  <input type="radio" id="private" name="mode_transport" value="private">
+                  <label for="private">Private</label>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Contact Information -->
+          <div class="form-row">
+            <div class="form-group">
+              <label>Patient Relative:</label>
+              <input type="text" name="patient_relative">
+            </div>
+            <div class="form-group">
+              <label>Contact Number:</label>
+              <input type="tel" name="contact_number">
+            </div>
+          </div>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label>Identification Mark 1:</label>
+              <input type="text" name="id_marks_1">
+            </div>
+            <div class="form-group">
+              <label>Identification Mark 2:</label>
+              <input type="text" name="id_marks_2">
+            </div>
+          </div>
+          
+          <!-- Presenting Complaints -->
+          <div class="form-row">
+            <div class="form-group full-width">
+              <label>Presenting Complaints:</label>
+              <textarea name="presenting_complaints" placeholder="Describe the patient's current symptoms and complaints..." required></textarea>
+            </div>
+          </div>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label>Weight (Kg):</label>
+              <input type="number" name="weight" step="0.1" min="0">
+            </div>
+            <div class="form-group">
+              <label>CBG:</label>
+              <input type="number" name="cbg" min="0">
+            </div>
+          </div>
+          
+          <!-- Past History -->
+          <div class="form-row">
+            <div class="form-group full-width">
+              <label>Past History:</label>
+              <div class="checkbox-group">
+                <div class="checkbox-item">
+                  <input type="checkbox" id="dm" name="past_history" value="dm">
+                  <label for="dm">DM</label>
+                </div>
+                <div class="checkbox-item">
+                  <input type="checkbox" id="htn" name="past_history" value="htn">
+                  <label for="htn">HTN</label>
+                </div>
+                <div class="checkbox-item">
+                  <input type="checkbox" id="ihd" name="past_history" value="ihd">
+                  <label for="ihd">IHD</label>
+                </div>
+                <div class="checkbox-item">
+                  <input type="checkbox" id="ptb" name="past_history" value="ptb">
+                  <label for="ptb">PTB</label>
+                </div>
+                <div class="checkbox-item">
+                  <input type="checkbox" id="asthma" name="past_history" value="asthma">
+                  <label for="asthma">ASTHMA</label>
+                </div>
+                <div class="checkbox-item">
+                  <input type="checkbox" id="epilepsy" name="past_history" value="epilepsy">
+                  <label for="epilepsy">EPILEPSY</label>
+                </div>
+                <div class="checkbox-item">
+                  <input type="checkbox" id="cva" name="past_history" value="cva">
+                  <label for="cva">CVA</label>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Vitals Section -->
+          <div class="vitals-section">
+            <h3>Vital Signs</h3>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Temperature:</label>
+                <input type="number" name="temp" step="0.1" min="90" max="110">
+                <span>°F</span>
+              </div>
+              <div class="form-group">
+                <label>Pulse:</label>
+                <input type="number" name="pulse" min="0" max="300">
+                <span>/min</span>
+              </div>
+              <div class="form-group">
+                <label>Resp Rate:</label>
+                <input type="number" name="resp_rate" min="0" max="60">
+                <span>/min</span>
+              </div>
+            </div>
+            
+            <div class="form-row">
+              <div class="form-group">
+                <label>Blood Pressure:</label>
+                <input type="text" name="bp" placeholder="120/80" pattern="[0-9]{2,3}/[0-9]{2,3}">
+                <span>mmHg</span>
+              </div>
+              <div class="form-group">
+                <label>SpO2:</label>
+                <input type="number" name="spo2" min="0" max="100">
+                <span>%</span>
+              </div>
+              <div class="form-group">
+                <label>Capillary Refill:</label>
+                <input type="number" name="capillary_refill" step="0.1" min="0">
+                <span>secs</span>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Pain Assessment -->
+          <div class="pain-scale">
+            <div style="width: 100%;">
+              <label>Pain Assessment:</label>
+              <div class="pain-scale-numbers">
+                <span>0 (No Pain)</span>
+                <span style="margin-left: auto;">10 (Worst Pain)</span>
+              </div>
+              <div class="form-group" style="width: 100%; margin-top: 10px;">
+                <input type="range" min="0" max="10" name="pain_score" id="painSlider" style="width: 100%;">
+                <span id="painValue" style="font-size: 16px; font-weight: bold;">0</span>/10
+              </div>
+            </div>
+          </div>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label>Pain Location:</label>
+              <input type="text" name="pain_site" placeholder="Describe location of pain">
+            </div>
+          </div>
+          
+          <!-- Neurological Response -->
+          <div class="form-row">
+            <div class="form-group full-width">
+              <label>Neurological Response:</label>
+              <div class="neuro-response">
+                <div class="neuro-item">
+                  <input type="radio" id="alert" name="neuro_response" value="alert">
+                  <label for="alert">Alert</label>
+                </div>
+                <div class="neuro-item">
+                  <input type="radio" id="verbal" name="neuro_response" value="verbal">
+                  <label for="verbal">Verbal</label>
+                </div>
+                <div class="neuro-item">
+                  <input type="radio" id="pain_resp" name="neuro_response" value="pain">
+                  <label for="pain_resp">Pain</label>
+                </div>
+                <div class="neuro-item">
+                  <input type="radio" id="unresponsive" name="neuro_response" value="unresponsive">
+                  <label for="unresponsive">Unresponsive</label>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Pregnancy Information (for females) -->
+          <div id="pregnancySection" style="display: none;">
+            <div class="form-row">
+              <div class="form-group">
+                <label>LMP:</label>
+                <input type="date" name="lmp">
+              </div>
+              <div class="form-group">
+                <label>Pregnant:</label>
+                <div class="radio-group">
+                  <div class="radio-item">
+                    <input type="radio" id="preg_yes" name="pregnancy" value="yes">
+                    <label for="preg_yes">Yes</label>
+                  </div>
+                  <div class="radio-item">
+                    <input type="radio" id="preg_no" name="pregnancy" value="no">
+                    <label for="preg_no">No</label>
+                  </div>
+                  <div class="radio-item">
+                    <input type="radio" id="preg_unknown" name="pregnancy" value="unknown">
+                    <label for="preg_unknown">Unknown</label>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="form-row">
+              <div class="form-group">
+                <label>Gravida:</label>
+                <input type="number" name="gravida" min="0">
+              </div>
+              <div class="form-group">
+                <label>Para:</label>
+                <input type="number" name="para" min="0">
+              </div>
+              <div class="form-group">
+                <label>EDD:</label>
+                <input type="date" name="edd">
+              </div>
+            </div>
+          </div>
+          
+          <!-- Triage Category -->
+          <div class="triage-section">
+            <div class="form-row">
+              <div class="form-group full-width">
+                <label>Triage Category *:</label>
+                <div class="triage-buttons">
+                  <button type="button" class="triage-btn red" onclick="selectTriage('red')">RED - Immediate</button>
+                  <button type="button" class="triage-btn yellow" onclick="selectTriage('yellow')">YELLOW - Urgent</button>
+                  <button type="button" class="triage-btn green" onclick="selectTriage('green')">GREEN - Non-urgent</button>
+                </div>
+                <input type="hidden" name="triage_category" id="triageCategory" required>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Assigned Bed No.:</label>
+                <input type="text" name="triage_bed_no">
+              </div>
+            </div>
+          </div>
+          
+          <!-- Signatures -->
+          <div class="signature-section">
+            <div class="signature-box">
+              <div class="signature-line"></div>
+              <label>Triage Nurse Name & Sign</label>
+            </div>
+            <div class="signature-box">
+              <div class="signature-line"></div>
+              <label>DAEP Name & Sign</label>
+            </div>
+          </div>
+          
+          <div class="footer-text">SRMC/2024/EMC-211</div>
+          
+          <button type="submit">Submit Triage Assessment</button>
+          <span id="triageMsg"></span>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Store registered patients
+    let patients = [];
+    let triageRecords = [];
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', function() {
+      initializeDateTimeField();
+      setupPainSlider();
+      setupPatientSelection();
+    });
+
+    function showTab(n) {
+      document.getElementById('tabContent1').style.display = n === 1 ? '' : 'none';
+      document.getElementById('tabContent2').style.display = n === 2 ? '' : 'none';
+      document.getElementById('tab1').classList.toggle('active', n === 1);
+      document.getElementById('tab2').classList.toggle('active', n === 2);
+    }
+
+    function initializeDateTimeField() {
+      const now = new Date();
+      const dateTimeInput = document.getElementById('dateTimeInput');
+      if (dateTimeInput) {
+        dateTimeInput.value = now.toISOString().slice(0, 16);
+      }
+    }
+
+    function setupPainSlider() {
+      const painSlider = document.getElementById('painSlider');
+      const painValue = document.getElementById('painValue');
+      if (painSlider && painValue) {
+        painSlider.addEventListener('input', function() {
+          painValue.textContent = this.value;
+        });
+      }
+    }
+
+    function setupPatientSelection() {
+      const patientSelect = document.getElementById('patientSelect');
+      if (patientSelect) {
+        patientSelect.addEventListener('change', function() {
+          const selectedPatientId = this.value;
+          if (selectedPatientId) {
+            displaySelectedPatientInfo(selectedPatientId);
+            document.getElementById('selectedPatientId').value = selectedPatientId;
+          } else {
+            hidePatientInfo();
+          }
+        });
+      }
+    }
+
+    function calculateAge(dateOfBirth) {
+      const today = new Date();
+      const birthDate = new Date(dateOfBirth);
+      let age = today.getFullYear() - birthDate.getFullYear();
+      const monthDiff = today.getMonth() - birthDate.getMonth();
+      if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+        age--;
+      }
+      return age;
+    }
+
+    function displaySelectedPatientInfo(patientId) {
+      const patient = patients.find(p => p.patient_id == patientId);
+      if (patient) {
+        const age = calculateAge(patient.dob);
+        const infoHtml = `
+          <strong>Name:</strong> ${patient.first_name} ${patient.last_name} | 
+          <strong>Age:</strong> ${age} years | 
+          <strong>Sex:</strong> ${patient.sex} | 
+          <strong>DOB:</strong> ${patient.dob}
+          ${patient.phone ? ` | <strong>Phone:</strong> ${patient.phone}` : ''}
+          ${patient.allergies ? ` | <strong>Allergies:</strong> ${patient.allergies}` : ''}
+        `;
+        document.getElementById('selectedPatientInfo').innerHTML = infoHtml;
+        document.getElementById('patientInfoDisplay').classList.add('show');
+        
+        // Show pregnancy section for females
+        const pregnancySection = document.getElementById('pregnancySection');
+        if (pregnancySection) {
+          pregnancySection.style.display = patient.sex === 'female' ? 'block' : 'none';
+        }
+      }
+    }
+
+    function hidePatientInfo() {
+      document.getElementById('patientInfoDisplay').classList.remove('show');
+      document.getElementById('selectedPatientId').value = '';
+      const pregnancySection = document.getElementById('pregnancySection');
+      if (pregnancySection) {
+        pregnancySection.style.display = 'none';
+      }
+    }
+
+    function loadPatients() {
+      const sel = document.getElementById('patientSelect');
+      if (sel) {
+        sel.innerHTML = '<option value="">Select Registered Patient</option>';
+        patients.forEach(p => {
+          const opt = document.createElement('option');
+          opt.value = p.patient_id;
+          opt.textContent = `${p.first_name} ${p.last_name} (DOB: ${p.dob})`;
+          sel.appendChild(opt);
+        });
+      }
+    }
+
+    function selectTriage(category) {
+      const triageCategory = document.getElementById('triageCategory');
+      if (triageCategory) {
+        triageCategory.value = category;
+      }
+      
+      // Update button appearance
+      const buttons = document.querySelectorAll('.triage-btn');
+      buttons.forEach(btn => {
+        btn.classList.remove('selected');
+        btn.style.opacity = '0.5';
+      });
+      
+      const selectedBtn = document.querySelector(`.triage-btn.${category}`);
+      if (selectedBtn) {
+        selectedBtn.classList.add('selected');
+        selectedBtn.style.opacity = '1';
+      }
+    }
+
+    // Patient registration form submission
+    document.getElementById('patientForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      const formData = new FormData(this);
+      const data = Object.fromEntries(formData.entries());
+      
+      // Generate a unique patient ID
+      data.patient_id = 'P' + Date.now();
+      
+      // Add patient to storage
+      patients.push(data);
+      
+      // Update UI
+      const msg = document.getElementById('patientMsg');
+      msg.textContent = "Patient registered successfully!";
+      msg.className = "success";
+      
+      // Reload patient dropdown
+      loadPatients();
+      
+      // Clear form
+      this.reset();
+      
+      // Switch to triage tab
+      setTimeout(() => {
+        showTab(2);
+        msg.textContent = "";
+      }, 2000);
+    });
+
+    // Triage form submission
+    document.getElementById('triageForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      const formData = new FormData(this);
+      const data = Object.fromEntries(formData.entries());
+      
+      // Validate required fields
+      if (!data.patient_id) {
+        alert('Please select a patient first.');
+        return;
+      }
+      
+      if (!data.triage_category) {
+        alert('Please select a triage category.');
+        return;
+      }
+      
+      if (!data.presenting_complaints) {
+        alert('Please enter presenting complaints.');
+        return;
+      }
+      
+      // Handle multiple checkboxes for past history
+      const pastHistoryBoxes = document.querySelectorAll('input[name="past_history"]:checked');
+      data.past_history = Array.from(pastHistoryBoxes).map(box => box.value);
+      
+      // Generate triage ID
+      data.triage_id = 'T' + Date.now();
+      data.timestamp = new Date().toISOString();
+      
+      // Add to triage records
+      triageRecords.push(data);
+      
+      // Update UI
+      const msg = document.getElementById('triageMsg');
+      msg.textContent = "Triage assessment completed successfully!";
+      msg.className = "success";
+      
+      // Clear form after a delay
+      setTimeout(() => {
+        this.reset();
+        hidePatientInfo();
+        // Reset triage buttons
+        document.querySelectorAll('.triage-btn').forEach(btn => {
+          btn.classList.remove('selected');
+          btn.style.opacity = '0.5';
+        });
+        // Reset pain slider
+        const painSlider = document.getElementById('painSlider');
+        const painValue = document.getElementById('painValue');
+        if (painSlider && painValue) {
+          painSlider.value = 0;
+          painValue.textContent = '0';
+        }
+        msg.textContent = "";
+      }, 3000);
+    });
+
+    // Form validation helpers
+    function validateVitalSigns() {
+      const temp = document.querySelector('input[name="temp"]').value;
+      const pulse = document.querySelector('input[name="pulse"]').value;
+      const bp = document.querySelector('input[name="bp"]').value;
+      const spo2 = document.querySelector('input[name="spo2"]').value;
+      
+      let warnings = [];
+      
+      if (temp && (temp < 96 || temp > 104)) {
+        warnings.push('Temperature seems abnormal');
+      }
+      
+      if (pulse && (pulse < 50 || pulse > 120)) {
+        warnings.push('Pulse rate seems abnormal');
+      }
+      
+      if (spo2 && spo2 < 95) {
+        warnings.push('Oxygen saturation is low');
+      }
+      
+      if (warnings.length > 0) {
+        return confirm('Warning: ' + warnings.join(', ') + '. Continue?');
+      }
+      
+      return true;
+    }
+
+    // Auto-suggest triage category based on vital signs
+    function suggestTriageCategory() {
+      const temp = parseFloat(document.querySelector('input[name="temp"]').value) || 0;
+      const pulse = parseInt(document.querySelector('input[name="pulse"]').value) || 0;
+      const spo2 = parseInt(document.querySelector('input[name="spo2"]').value) || 100;
+      const painScore = parseInt(document.getElementById('painSlider').value) || 0;
+      const neuroResponse = document.querySelector('input[name="neuro_response"]:checked')?.value;
+      
+      // Critical conditions (RED)
+      if (spo2 < 90 || temp > 103 || pulse < 50 || pulse > 150 || 
+          neuroResponse === 'unresponsive' || painScore >= 8) {
+        return 'red';
+      }
+      
+      // Urgent conditions (YELLOW)
+      if (spo2 < 95 || temp > 101 || pulse < 60 || pulse > 120 || 
+          painScore >= 5) {
+        return 'yellow';
+      }
+      
+      // Non-urgent (GREEN)
+      return 'green';
+    }
+
+    // Auto-suggest triage when vital signs change
+    document.addEventListener('input', function(e) {
+      if (e.target.matches('input[name="temp"], input[name="pulse"], input[name="spo2"], input[name="pain_score"]')) {
+        setTimeout(() => {
+          const suggested = suggestTriageCategory();
+          const currentCategory = document.getElementById('triageCategory').value;
+          
+          if (!currentCategory) {
+            const suggestionText = {
+              'red': 'Consider RED triage based on vital signs',
+              'yellow': 'Consider YELLOW triage based on vital signs', 
+              'green': 'Consider GREEN triage based on vital signs'
+            };
+            
+            // Show subtle suggestion (you could make this more prominent)
+            console.log(suggestionText[suggested]);
+          }
+        }, 1000);
+      }
+    });
+
+    // Enhanced form interactions
+    document.addEventListener('change', function(e) {
+      // Auto-fill contact number from patient info
+      if (e.target.id === 'patientSelect') {
+        const selectedPatient = patients.find(p => p.patient_id == e.target.value);
+        if (selectedPatient && selectedPatient.phone) {
+          const contactField = document.querySelector('input[name="contact_number"]');
+          if (contactField && !contactField.value) {
+            contactField.value = selectedPatient.phone;
+          }
+        }
+      }
+      
+      // Validate BP format
+      if (e.target.name === 'bp') {
+        const bpPattern = /^\d{2,3}\/\d{2,3}$/;
+        if (e.target.value && !bpPattern.test(e.target.value)) {
+          e.target.style.borderColor = 'red';
+          e.target.title = 'Format: 120/80';
+        } else {
+          e.target.style.borderColor = '';
+          e.target.title = '';
+        }
+      }
+    });
+
+    // Keyboard shortcuts
+    document.addEventListener('keydown', function(e) {
+      if (e.ctrlKey || e.metaKey) {
+        switch(e.key) {
+          case '1':
+            e.preventDefault();
+            showTab(1);
+            break;
+          case '2':
+            e.preventDefault();
+            showTab(2);
+            break;
+          case 'r':
+            if (document.getElementById('tabContent2').style.display !== 'none') {
+              e.preventDefault();
+              selectTriage('red');
+            }
+            break;
+          case 'y':
+            if (document.getElementById('tabContent2').style.display !== 'none') {
+              e.preventDefault();
+              selectTriage('yellow');
+            }
+            break;
+          case 'g':
+            if (document.getElementById('tabContent2').style.display !== 'none') {
+              e.preventDefault();
+              selectTriage('green');
+            }
+            break;
+        }
+      }
+    });
+
+    // Print functionality (could be extended)
+    function printTriageForm() {
+      window.print();
+    }
+
+    // Data export functionality (basic)
+    function exportData() {
+      const data = {
+        patients: patients,
+        triageRecords: triageRecords,
+        exportDate: new Date().toISOString()
+      };
+      
+      const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'emergency_triage_data.json';
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    // Console commands for testing/demo
+    window.debugInfo = function() {
+      console.log('Registered Patients:', patients);
+      console.log('Triage Records:', triageRecords);
+    };
+
+    window.clearData = function() {
+      patients = [];
+      triageRecords = [];
+      loadPatients();
+      console.log('All data cleared');
+    };
+
+    // Initial load
+    loadPatients();
+  </script>
+</body>
+</html>
