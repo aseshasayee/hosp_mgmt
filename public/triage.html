@@ -629,18 +629,28 @@
       }
     }
 
-    function loadPatients() {
-      const sel = document.getElementById('patientSelect');
-      if (sel) {
-        sel.innerHTML = '<option value="">Select Registered Patient</option>';
-        patients.forEach(p => {
-          const opt = document.createElement('option');
-          opt.value = p.patient_id;
-          opt.textContent = `${p.first_name} ${p.last_name} (DOB: ${p.dob})`;
-          sel.appendChild(opt);
-        });
-      }
-    }
+    async function loadPatients() {
+  const sel = document.getElementById('patientSelect');
+  if (!sel) return;
+
+  // Fetch from backend
+  try {
+    const res = await fetch('/patients');
+    const data = await res.json();
+    patients = data; // update the global array for other uses
+
+    sel.innerHTML = '<option value="">Select Registered Patient</option>';
+    patients.forEach(p => {
+      const opt = document.createElement('option');
+      opt.value = p.patient_id;
+      opt.textContent = `${p.first_name} ${p.last_name} (DOB: ${p.dob})`;
+      sel.appendChild(opt);
+    });
+  } catch (err) {
+    sel.innerHTML = '<option value="">Could not load patients</option>';
+  }
+}
+
 
     function selectTriage(category) {
       const triageCategory = document.getElementById('triageCategory');
